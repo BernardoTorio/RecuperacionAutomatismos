@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Un cuadro con varios motores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1560px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:clamp(1.45rem,3vw,2.1rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 16px;max-width:78ch}
+.grid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.3fr) 290px;gap:16px;align-items:start}
+@media (max-width:1250px){.grid{grid-template-columns:minmax(0,0.85fr) minmax(0,1.2fr)}.side{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}}
+@media (max-width:780px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:60vh;min-width:300px}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.explain{min-height:6.5em;font-size:1.08rem;border-left:6px solid var(--flow)}
+.explain .k,.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1;padding:0}
+
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:12px}
+.ctl h3{font-size:1rem;margin:0 0 6px}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.val{text-align:center;font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.val small{display:block;font-size:.8rem;font-weight:400;color:var(--muted)}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 12px;cursor:pointer;user-select:none;-webkit-user-select:none}
+button:hover{border-color:#1F4E79}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+button.go{background:#2E8B3E;color:#fff;border-color:#2E8B3E}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;padding:9px 6px}
+.below{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:860px){.below{grid-template-columns:1fr}}
+.below .wide{grid-column:1 / -1}
+.below > *,.layout > *{min-width:0}
+.card h2{font-size:1.1rem;margin:0 0 8px}
+.card ul,.card ol{margin:6px 0 0;padding-left:22px}
+.card li{margin:4px 0}
+.now{border-left:6px solid var(--flow);font-size:1.06rem;min-height:7em}
+.now .ok{color:var(--ok);font-weight:700}.now .bad{color:var(--warn);font-weight:700}
+.howto{border-left:6px solid #1F4E79}
+.ojo{border-left:6px solid #C55A11}
+.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem;margin-top:6px}
+table.t th,table.t td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+table.t th{background:rgba(46,139,62,.14)}
+.foot{color:var(--muted);font-size:.9rem;margin-top:10px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
+
+
+#svg{max-height:62vh}
+.lbl{font-family:"Atkinson Hyperlegible",Verdana,sans-serif}
+.mot{border:2px solid var(--line);border-left-width:8px;border-radius:10px;padding:8px 10px;margin-top:8px;cursor:pointer}
+.mot.sel{box-shadow:0 0 0 3px #1F4E79 inset}
+.mot .mh{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
+.mot select{font:inherit;font-size:.95rem;padding:4px 6px;border-radius:8px;border:2px solid var(--line);background:var(--btn);color:var(--ink);width:100%;margin:6px 0}
+.mot .seg button{padding:6px 4px;font-size:.88rem}
+.mot button.x{padding:2px 9px;font-size:.9rem;min-width:44px}
+.mot .ms{flex:1;text-align:right;font-weight:400;font-size:.88rem;color:var(--muted)}
+.mot .seg button small{display:block;font-weight:400;font-size:.8rem}
+.mlab2{font-size:.85rem;color:var(--muted);font-weight:700;margin:6px 0 4px}
+.card .bad{color:var(--warn);font-weight:700}.card .ok{color:var(--ok);font-weight:700}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+button:disabled{opacity:.45;cursor:default}
+@media (max-width:900px){.layout>.draw{display:contents}.layout .plate{order:3;margin-top:0!important}}
+button.red{background:#C0392B;color:#fff;border-color:#C0392B}
+.plate{padding:10px}
+.plate svg{max-height:34vh}
+.ptit{font-weight:700;margin:0 4px 6px;color:#1a1a1a}
+.pnote{margin:6px 4px 0;font-size:.95rem;color:#1a1a1a}
+.pnote .bad{color:#C0392B;font-weight:700}.pnote .ok{color:#2E8B3E;font-weight:700}
+
+
+/* --- tira del tema, veredicto bajo el dibujo, móvil y contraste --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:var(--ok)}
+.t6nav .steps a.cur.seen::after{color:#fff}
+@media (max-width:460px){.t6nav .steps{gap:4px}.t6nav .steps a{font-size:.85rem;padding:0 1px}.t6nav .steps a.seen{position:relative}.t6nav .steps a.seen::after{position:absolute;top:1px;right:2px;margin:0;font-size:.62em}}
+.serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
+button,select{min-height:44px}
+input[type=range]{height:44px}
+button:disabled{opacity:.45;cursor:default}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#6fd98a;--warn:#ff8a7a}}
+:root[data-theme="dark"]{--ok:#6fd98a;--warn:#ff8a7a}
+@media (max-width:620px){.crumbs{display:none}}
+@media (max-width:900px){.stick{position:sticky;top:0;z-index:6;box-shadow:0 6px 14px rgba(0,0,0,.22)}.stick #svg{max-height:40vh}}
+.simfig{float:right;width:min(320px,48%);margin:0 0 8px 16px}
+.simfig .sheet{padding:6px}
+.simfig .sheet svg{display:block;width:100%;height:auto;min-width:0;max-height:none}
+.simfig figcaption{font-size:.88rem;color:var(--muted);margin-top:4px;text-align:center}
+.sim::after{content:"";display:block;clear:both}
+@media (max-width:620px){.simfig{float:none;width:100%;max-width:340px;margin:0 auto 10px}}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#ejercicios" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#ejercicios">Ejercicios</a><span class="sep">›</span><a href="index.html#ejercicios">Tema 6</a><span class="sep">›</span><b>T6.11 Cuadro con varios motores</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 6"><a class="arr" href="proteger_motor.html" aria-label="Anterior: T6.8 Térmico, fusibles y guardamotor">‹ T6.8</a><span class="where">Tema 6 · 6 de 6</span><a class="arr" href="index.html#ejercicios" aria-label="Volver a los ejercicios">Fin ›</a><div class="steps"><a href="intensidad_calor.html" title="La intensidad calienta los cables">T6.4</a><a href="regla_ib_in_iz.html" title="La regla de oro">T6.5</a><a href="curvas_disparo.html" title="Las curvas de disparo">T6.6</a><a href="arranque_curvas.html" title="El arranque sobre las curvas">T6.7</a><a href="proteger_motor.html" title="Térmico, fusibles y guardamotor">T6.8</a><a href="cuadro_motores.html" class="cur" aria-current="page" title="Un cuadro con varios motores">T6.11</a></div></nav>
+  <h1>Un cuadro con varios motores</h1>
+  <p class="sub">Añade motores leyendo su <b>placa</b> (¿estrella o triángulo?). Mira cómo se calcula la <b>línea general</b>, qué marcan las <b>pinzas</b> en las tres fases, qué pasa si a un motor le <b>falta una fase</b> y qué salta con un <b>cortocircuito</b>.</p>
+  <p class="serve">Te sirve para los ejercicios <b>3, 12, 13, 17, 19 y 20</b>.</p>
+
+  <div class="layout">
+    <div class="draw">
+      <div class="sheet stick" aria-label="Cuadro con la línea general y las líneas de los motores">
+        <svg id="svg" viewBox="0 0 780 470" role="img" aria-label="Línea general y líneas de los motores con sus protecciones"></svg>
+        <p class="verd" id="verd" aria-hidden="true"></p>
+      </div>
+      <div class="sheet plate" style="margin-top:12px">
+        <div class="ptit" id="pTit"></div>
+        <svg id="plate" viewBox="0 0 400 230" role="img" aria-label="Placa del motor"></svg>
+        <p class="pnote" id="pNote"></p>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card ctl">
+        <h3>Línea general (-Q0)</h3>
+        <div class="row"><button id="gDown" aria-label="Calibre general más pequeño">◀</button><div class="val" id="vG"></div><button id="gUp" aria-label="Calibre general más grande">▶</button></div>
+        <div class="seg" style="margin-top:8px"><button id="gAuto">Calcularla bien</button><button id="gReset">Rearmar -Q0</button></div>
+      </div>
+      <div class="card ctl">
+        <h3>Motores (red de 400 V)</h3>
+        <div id="mots"></div>
+        <div class="seg" style="margin-top:8px"><button id="bAdd" class="go">+ Añadir motor</button></div>
+        <div class="seg" style="margin-top:8px"><button id="bAll">Todos en marcha</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="below">
+    <div class="card now wide" aria-live="polite"><h2>Qué está pasando</h2><div id="now"></div></div>
+    <div class="card wide howto">
+      <h2 id="recT">La receta, paso a paso</h2>
+      <div id="rec"></div>
+      <p class="foot">Cada línea se dimensiona con esta receta. En esta animación todos los motores arrancan con <b>6 veces</b> su corriente durante <b>0,4 s</b>, como en los ejercicios 12 y 19.</p>
+    </div>
+    <div class="card howto wide pqs">
+      <h2>Para qué sirve</h2>
+      <p style="margin:0">Para dimensionar un <b>cuadro entero</b>, como en el examen: cada motor con su línea (corriente de la placa, calibre, cable, curva y térmico) y una <b>línea general</b> para todos. Y para ver qué marcan las pinzas cuando falta una fase o hay un cortocircuito.</p>
+    </div>
+    <div class="card howto">
+      <h2>Leer la placa: ¿estrella o triángulo?</h2>
+      <p style="margin:0">La placa trae dos cajas: <b>Y</b> (estrella) y <b>Δ</b> (triángulo). Cada una dice la tensión y la corriente del motor conectado así. <b>Lee la caja de la conexión que te digan.</b></p>
+      <p style="margin:8px 0 0">Con la red de <b>400 V</b>, la caja que vale es la que pone <b>400 V</b>: los motores pequeños (230/400 V) van en <b>estrella</b> y los grandes (400/690 V), en <b>triángulo</b>.</p>
+    </div>
+    <div class="card howto">
+      <h2>La línea general</h2>
+      <div id="gNow"></div>
+      <ul style="margin-top:0">
+        <li>Su corriente es la <b>suma</b> de las de todos los motores que pueden funcionar a la vez.</li>
+        <li>Su calibre: <b>igual o mayor</b> que esa suma, sin pasar de lo que aguanta su cable… y <b>mayor que el más grande</b> de las líneas de abajo.</li>
+        <li>Así, con una avería en un motor salta <b>solo su protección</b> y los demás siguen: es la <b>selectividad</b>.</li>
+        <li>Y el cable de la general, como siempre: I<sub>n</sub> ≤ I<sub>z</sub>.</li>
+      </ul>
+    </div>
+    <div class="card ojo sim">
+      <figure class="simfig"><div class="sheet"><svg viewBox="0 0 330 324" role="img" aria-label="Esquema de fuerza: la línea general -Q0 reparte L1, L2 y L3 a tres motores; cada motor, con su -Q, -KM y -F, toma corriente de las tres fases" font-family="Atkinson Hyperlegible,Verdana,sans-serif"><text x="160" y="14" text-anchor="end" font-size="11"  fill="#56606b">L1 · L2 · L3  (400 V)</text><line x1="168" y1="6" x2="168" y2="36" stroke="#D0191C" stroke-width="2.2" /><line x1="180" y1="6" x2="180" y2="36" stroke="#D0191C" stroke-width="2.2" /><line x1="192" y1="6" x2="192" y2="36" stroke="#D0191C" stroke-width="2.2" /><line x1="159" y1="40" x2="168" y2="60" stroke="#1a1a1a" stroke-width="2"/><path d="M165 33 l6 6 M171 33 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="171" y1="40" x2="180" y2="60" stroke="#1a1a1a" stroke-width="2"/><path d="M177 33 l6 6 M183 33 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="183" y1="40" x2="192" y2="60" stroke="#1a1a1a" stroke-width="2"/><path d="M189 33 l6 6 M195 33 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="144" y1="50" x2="188" y2="50" stroke="#1a1a1a" stroke-width="1.4" stroke-dasharray="3 2"/><rect x="136" y="42" width="10" height="16" fill="#fff" stroke="#1a1a1a" stroke-width="1.4"/><text x="132" y="54" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-Q0</text><line x1="168" y1="60" x2="168" y2="96" stroke="#D0191C" stroke-width="2.2" /><circle cx="168" cy="96" r="3" fill="#D0191C"/><line x1="180" y1="60" x2="180" y2="108" stroke="#D0191C" stroke-width="2.2" /><circle cx="180" cy="108" r="3" fill="#D0191C"/><line x1="192" y1="60" x2="192" y2="120" stroke="#D0191C" stroke-width="2.2" /><circle cx="192" cy="120" r="3" fill="#D0191C"/><ellipse cx="168" cy="78" rx="5" ry="7" fill="none" stroke="#C55A11" stroke-width="2"/><ellipse cx="180" cy="78" rx="5" ry="7" fill="none" stroke="#C55A11" stroke-width="2"/><ellipse cx="192" cy="78" rx="5" ry="7" fill="none" stroke="#C55A11" stroke-width="2"/><text x="204" y="74" font-size="11" font-weight="700" fill="#C55A11">pinza: lo mismo</text><text x="204" y="87" font-size="11" font-weight="700" fill="#C55A11">en L1, L2 y L3</text><line x1="58" y1="96" x2="302" y2="96" stroke="#D0191C" stroke-width="2.2" /><text x="52" y="100" text-anchor="end" font-size="10" font-weight="700" fill="#D0191C">L1</text><line x1="58" y1="108" x2="302" y2="108" stroke="#D0191C" stroke-width="2.2" /><text x="52" y="112" text-anchor="end" font-size="10" font-weight="700" fill="#D0191C">L2</text><line x1="58" y1="120" x2="302" y2="120" stroke="#D0191C" stroke-width="2.2" /><text x="52" y="124" text-anchor="end" font-size="10" font-weight="700" fill="#D0191C">L3</text><line x1="58" y1="96" x2="58" y2="148" stroke="#D0191C" stroke-width="2.2" /><circle cx="58" cy="96" r="3" fill="#D0191C"/><line x1="70" y1="108" x2="70" y2="148" stroke="#D0191C" stroke-width="2.2" /><circle cx="70" cy="108" r="3" fill="#D0191C"/><line x1="82" y1="120" x2="82" y2="148" stroke="#D0191C" stroke-width="2.2" /><circle cx="82" cy="120" r="3" fill="#D0191C"/><line x1="49" y1="152" x2="58" y2="172" stroke="#1a1a1a" stroke-width="2"/><path d="M55 145 l6 6 M61 145 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="61" y1="152" x2="70" y2="172" stroke="#1a1a1a" stroke-width="2"/><path d="M67 145 l6 6 M73 145 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="73" y1="152" x2="82" y2="172" stroke="#1a1a1a" stroke-width="2"/><path d="M79 145 l6 6 M85 145 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="34" y1="162" x2="78" y2="162" stroke="#1a1a1a" stroke-width="1.4" stroke-dasharray="3 2"/><rect x="26" y="154" width="10" height="16" fill="#fff" stroke="#1a1a1a" stroke-width="1.4"/><text x="22" y="166" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-Q1</text><line x1="58" y1="172" x2="58" y2="196" stroke="#D0191C" stroke-width="2.2" /><line x1="70" y1="172" x2="70" y2="196" stroke="#D0191C" stroke-width="2.2" /><line x1="82" y1="172" x2="82" y2="196" stroke="#D0191C" stroke-width="2.2" /><line x1="49" y1="200" x2="58" y2="220" stroke="#1a1a1a" stroke-width="2"/><path d="M54 196 a4 4 0 0 0 8 0" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><line x1="61" y1="200" x2="70" y2="220" stroke="#1a1a1a" stroke-width="2"/><path d="M66 196 a4 4 0 0 0 8 0" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><line x1="73" y1="200" x2="82" y2="220" stroke="#1a1a1a" stroke-width="2"/><path d="M78 196 a4 4 0 0 0 8 0" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><line x1="48" y1="210" x2="78" y2="210" stroke="#1a1a1a" stroke-width="1.4" stroke-dasharray="3 2"/><text x="44" y="214" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-KM1</text><line x1="58" y1="220" x2="58" y2="236" stroke="#D0191C" stroke-width="2.2" /><line x1="70" y1="220" x2="70" y2="236" stroke="#D0191C" stroke-width="2.2" /><line x1="82" y1="220" x2="82" y2="236" stroke="#D0191C" stroke-width="2.2" /><rect x="50" y="236" width="40" height="22" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M58 236 v5 h-4 v8 h4 v9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M70 236 v5 h-4 v8 h4 v9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M82 236 v5 h-4 v8 h4 v9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><text x="46" y="251" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-F1</text><line x1="58" y1="258" x2="58" y2="272" stroke="#D0191C" stroke-width="2.2" /><line x1="70" y1="258" x2="70" y2="272" stroke="#D0191C" stroke-width="2.2" /><line x1="82" y1="258" x2="82" y2="272" stroke="#D0191C" stroke-width="2.2" /><circle cx="70" cy="294" r="22" fill="#fff" stroke="#1a1a1a" stroke-width="2"/><text x="70" y="293" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a1a">M</text><text x="70" y="307" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">3~</text><text x="44" y="298" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-M1</text><line x1="168" y1="96" x2="168" y2="148" stroke="#D0191C" stroke-width="2.2" /><line x1="180" y1="108" x2="180" y2="148" stroke="#D0191C" stroke-width="2.2" /><line x1="192" y1="120" x2="192" y2="148" stroke="#D0191C" stroke-width="2.2" /><line x1="159" y1="152" x2="168" y2="172" stroke="#1a1a1a" stroke-width="2"/><path d="M165 145 l6 6 M171 145 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="171" y1="152" x2="180" y2="172" stroke="#1a1a1a" stroke-width="2"/><path d="M177 145 l6 6 M183 145 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="183" y1="152" x2="192" y2="172" stroke="#1a1a1a" stroke-width="2"/><path d="M189 145 l6 6 M195 145 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="144" y1="162" x2="188" y2="162" stroke="#1a1a1a" stroke-width="1.4" stroke-dasharray="3 2"/><rect x="136" y="154" width="10" height="16" fill="#fff" stroke="#1a1a1a" stroke-width="1.4"/><text x="132" y="166" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-Q2</text><line x1="168" y1="172" x2="168" y2="196" stroke="#D0191C" stroke-width="2.2" /><line x1="180" y1="172" x2="180" y2="196" stroke="#D0191C" stroke-width="2.2" /><line x1="192" y1="172" x2="192" y2="196" stroke="#D0191C" stroke-width="2.2" /><line x1="159" y1="200" x2="168" y2="220" stroke="#1a1a1a" stroke-width="2"/><path d="M164 196 a4 4 0 0 0 8 0" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><line x1="171" y1="200" x2="180" y2="220" stroke="#1a1a1a" stroke-width="2"/><path d="M176 196 a4 4 0 0 0 8 0" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><line x1="183" y1="200" x2="192" y2="220" stroke="#1a1a1a" stroke-width="2"/><path d="M188 196 a4 4 0 0 0 8 0" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><line x1="158" y1="210" x2="188" y2="210" stroke="#1a1a1a" stroke-width="1.4" stroke-dasharray="3 2"/><text x="154" y="214" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-KM2</text><line x1="168" y1="220" x2="168" y2="236" stroke="#D0191C" stroke-width="2.2" /><line x1="180" y1="220" x2="180" y2="236" stroke="#D0191C" stroke-width="2.2" /><line x1="192" y1="220" x2="192" y2="236" stroke="#D0191C" stroke-width="2.2" /><rect x="160" y="236" width="40" height="22" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M168 236 v5 h-4 v8 h4 v9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M180 236 v5 h-4 v8 h4 v9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M192 236 v5 h-4 v8 h4 v9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><text x="156" y="251" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-F2</text><line x1="168" y1="258" x2="168" y2="272" stroke="#D0191C" stroke-width="2.2" /><line x1="180" y1="258" x2="180" y2="272" stroke="#D0191C" stroke-width="2.2" /><line x1="192" y1="258" x2="192" y2="272" stroke="#D0191C" stroke-width="2.2" /><circle cx="180" cy="294" r="22" fill="#fff" stroke="#1a1a1a" stroke-width="2"/><text x="180" y="293" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a1a">M</text><text x="180" y="307" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">3~</text><text x="154" y="298" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-M2</text><line x1="278" y1="96" x2="278" y2="148" stroke="#D0191C" stroke-width="2.2" /><circle cx="278" cy="96" r="3" fill="#D0191C"/><line x1="290" y1="108" x2="290" y2="148" stroke="#D0191C" stroke-width="2.2" /><circle cx="290" cy="108" r="3" fill="#D0191C"/><line x1="302" y1="120" x2="302" y2="148" stroke="#D0191C" stroke-width="2.2" /><circle cx="302" cy="120" r="3" fill="#D0191C"/><line x1="269" y1="152" x2="278" y2="172" stroke="#1a1a1a" stroke-width="2"/><path d="M275 145 l6 6 M281 145 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="281" y1="152" x2="290" y2="172" stroke="#1a1a1a" stroke-width="2"/><path d="M287 145 l6 6 M293 145 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="293" y1="152" x2="302" y2="172" stroke="#1a1a1a" stroke-width="2"/><path d="M299 145 l6 6 M305 145 l-6 6" stroke="#1a1a1a" stroke-width="1.6"/><line x1="254" y1="162" x2="298" y2="162" stroke="#1a1a1a" stroke-width="1.4" stroke-dasharray="3 2"/><rect x="246" y="154" width="10" height="16" fill="#fff" stroke="#1a1a1a" stroke-width="1.4"/><text x="242" y="166" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-Q3</text><line x1="278" y1="172" x2="278" y2="196" stroke="#D0191C" stroke-width="2.2" /><line x1="290" y1="172" x2="290" y2="196" stroke="#D0191C" stroke-width="2.2" /><line x1="302" y1="172" x2="302" y2="196" stroke="#D0191C" stroke-width="2.2" /><line x1="269" y1="200" x2="278" y2="220" stroke="#1a1a1a" stroke-width="2"/><path d="M274 196 a4 4 0 0 0 8 0" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><line x1="281" y1="200" x2="290" y2="220" stroke="#1a1a1a" stroke-width="2"/><path d="M286 196 a4 4 0 0 0 8 0" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><line x1="293" y1="200" x2="302" y2="220" stroke="#1a1a1a" stroke-width="2"/><path d="M298 196 a4 4 0 0 0 8 0" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><line x1="268" y1="210" x2="298" y2="210" stroke="#1a1a1a" stroke-width="1.4" stroke-dasharray="3 2"/><text x="264" y="214" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-KM3</text><line x1="278" y1="220" x2="278" y2="236" stroke="#D0191C" stroke-width="2.2" /><line x1="290" y1="220" x2="290" y2="236" stroke="#D0191C" stroke-width="2.2" /><line x1="302" y1="220" x2="302" y2="236" stroke="#D0191C" stroke-width="2.2" /><rect x="270" y="236" width="40" height="22" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M278 236 v5 h-4 v8 h4 v9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M290 236 v5 h-4 v8 h4 v9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><path d="M302 236 v5 h-4 v8 h4 v9" fill="none" stroke="#1a1a1a" stroke-width="1.6"/><text x="266" y="251" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-F3</text><line x1="278" y1="258" x2="278" y2="272" stroke="#D0191C" stroke-width="2.2" /><line x1="290" y1="258" x2="290" y2="272" stroke="#D0191C" stroke-width="2.2" /><line x1="302" y1="258" x2="302" y2="272" stroke="#D0191C" stroke-width="2.2" /><circle cx="290" cy="294" r="22" fill="#fff" stroke="#1a1a1a" stroke-width="2"/><text x="290" y="293" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1a1a">M</text><text x="290" y="307" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a1a">3~</text><text x="264" y="298" text-anchor="end" font-size="12" font-weight="700" fill="#1a1a1a">-M3</text></svg></div><figcaption>Los tres motores toman corriente de <b>L1, L2 y L3</b>.</figcaption></figure>
+      <h2>Las tres fases llevan la misma corriente</h2>
+      <p style="margin:0">En un motor trifásico sano, las tres fases (L1, L2, L3) llevan <b>la misma corriente</b>: el consumo es <b>simétrico</b>. Con la pinza tienes que leer lo mismo en las tres.</p>
+      <p style="margin:8px 0 0">Si <b>una fase marca 0 A</b> y las otras suben: <b>falta una fase</b> (fusible fundido, tornillo suelto, contacto quemado). El motor zumba, se calienta y acaba saltando el térmico.</p>
+    </div>
+    <div class="card">
+      <h2>Cómo funciona esta animación</h2>
+      <ul style="margin-top:0">
+        <li>Añade motores (hasta 4). <b>Toca un motor</b>, en el dibujo o en la lista, para ver su placa, su línea y su receta.</li>
+        <li>Para cada uno elige la <b>placa</b> y <b>qué caja lees</b>: estrella o triángulo. Prueba a leer la que no es.</li>
+        <li>Cada línea se dimensiona con la <b>receta</b> de los 6 pasos, que tienes escrita con sus números. La <b>general</b> también se calcula, pero puedes cambiar su calibre para ver qué pasa.</li>
+        <li>Pon motores en <b>marcha</b> y mira las pinzas. Prueba <b>Quitar una fase</b> y <b>Cortocircuito</b>.</li>
+        <li>El tiempo va acelerado.</li>
+      </ul>
+    </div>
+  </div>
+
+  <a class="nextbig" href="index.html#ejercicios">Has llegado al final del Tema 6 · Volver a los ejercicios →</a>
+
+</main>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i);};
+var NS='http://www.w3.org/2000/svg';
+// placa: kW, rpm, cos, [V,I] en Δ, [V,I] en Y
+var P=[['0,75',1395,'0,75',[230,3.2],[400,1.85]],['1,5',1415,'0,79',[230,6.0],[400,3.5]],['2,2',1420,'0,81',[230,8.4],[400,4.85]],['3',1435,'0,82',[230,11.0],[400,6.4]],['4',1440,'0,83',[230,14.3],[400,8.3]],
+       ['5,5',1450,'0,84',[400,11],[690,6.4]],['7,5',1455,'0,85',[400,14.8],[690,8.6]],['11',1460,'0,85',[400,21.5],[690,12.4]],['15',1465,'0,86',[400,28.5],[690,16.5]],['18,5',1470,'0,86',[400,35],[690,20.2]],['22',1470,'0,87',[400,41],[690,23.7]]];
+var CAL=[6,10,16,20,25,32,40,50,63,80,100,125,160];
+var CAB=[[1.5,16.5],[2.5,23],[4,31],[6,40],[10,54],[16,73],[25,95],[35,119],[50,145],[70,185]];
+var TERM=[[0.63,1],[1,1.6],[1.6,2.5],[2.5,4],[4,6],[6,9],[9,13],[13,18],[18,25],[25,32],[32,40],[40,50],[50,65],[65,80]];
+var TX=[2,3,4,5,7,10,15,20], TMIN=[20,4,2,1.2,0.6,0.3,0.15,0.1];
+var MCOL=['#7b2cbf','#d6336c','#0b7285','#5c4033'];
+var KARR=6, TARR=0.4; // arranque de los ejercicios 12 y 19: 6 veces durante 0,4 s
+// cuadro inicial: el del ejercicio 12
+var st={mots:[{p:3,c:'Y'},{p:7,c:'D'},{p:6,c:'D'}].map(mk),sel:0,gOff:0,gTrip:false,gh:0,msg:'',corto:''};
+function mk(o){ return {p:o.p,c:o.c,on:false,fase:false,trip:null,h:0}; }
+function f(x,d){ if(d===undefined) d=(Math.abs(x-Math.round(x))<1e-9?0:(x>=100?0:(x>=10?1:2))); var s=x.toFixed(d); if(s.indexOf('.')>=0) s=s.replace(/0+$/,'').replace(/\.$/,''); return s.replace('.',','); }
+function box(mo){ var pl=P[mo.p]; return mo.c==='D'?pl[3]:pl[4]; }
+function IB(mo){ return box(mo)[1]; }   // la corriente de la caja que se ha leído: con ella se dimensiona
+function real(mo){ var pl=P[mo.p]; return pl[3][0]===400?pl[3][1]:pl[4][1]; }   // la que pide de verdad con 400 V
+function okCon(mo){ return box(mo)[0]===400; }
+function nom(i){ return '-M'+(i+1); }
+function rg(r){ return f(r[0])+'-'+f(r[1])+' A'; }
+function say(m,c){ st.msg=m||''; st.corto=c||''; }
+function line(mo){
+  var ib=IB(mo), ci=CAL.findIndex(function(c){return c>=ib;}), cur, x;
+  while(true){ x=KARR*ib/CAL[ci]; if(x<5){cur='C';break;} if(x<10){cur='D';break;} ci++; }
+  var cal=CAL[ci], cab=CAB.find(function(c){return c[1]>=cal;}), th=TERM.find(function(t){return t[0]<=ib&&ib<=t[1];})||TERM[TERM.length-1];
+  var col=TX.find(function(t){return t>=x-1e-9;});
+  return {cal:cal,ci:ci,cur:cur,cab:cab,th:th,ib:ib,x:x,col:col,tmin:TMIN[TX.indexOf(col)]};
+}
+function cabOf(c){ return CAB.find(function(k){return k[1]>=c;})||CAB[CAB.length-1]; }
+function gen(){
+  var sum=st.mots.reduce(function(a,m){return a+IB(m);},0);
+  var mx=Math.max.apply(null,st.mots.map(function(m){return line(m).cal;}));
+  var ai=CAL.findIndex(function(c){return c>=sum&&c>mx;}), none=ai<0; if(none) ai=CAL.length-1;
+  var gi=Math.max(0,Math.min(CAL.length-1,ai+st.gOff));
+  return {sum:sum,mx:mx,auto:CAL[ai],none:none,cal:CAL[gi],gi:gi,cab:cabOf(CAL[gi]),cabAuto:cabOf(CAL[ai])};
+}
+function phases(mo){ if(!mo.on||mo.trip||st.gTrip) return [0,0,0]; var i=real(mo); return mo.fase?[0,i*1.73,i*1.73]:[i,i,i]; }
+function ptxt(ph){ return 'L1 '+f(ph[0],1)+' · L2 '+f(ph[1],1)+' · L3 '+f(ph[2],1)+' A'; }
+function estado(mo){ return mo.trip?'parado (ha saltado)':(mo.on&&!st.gTrip?(mo.fase?'¡le falta una fase!':'en marcha'):'parado'); }
+var cache={};
+function setH(id,h){ if(cache[id]!==h){ $(id).innerHTML=h; cache[id]=h; } }
+// ------------ dibujo
+var svg=$('svg');
+function el(tag,a,t,par){ var e=document.createElementNS(NS,tag); for(var k in a) e.setAttribute(k,a[k]); if(t!==undefined) e.textContent=t; (par||svg).appendChild(e); return e; }
+function boxd(x,y,w,h,t1,t2,tripped,fs){
+  fs=fs||13.5;
+  el('rect',{x:x-w/2,y:y,width:w,height:h,rx:8,fill:tripped?'#ffe9e6':'#fff',stroke:tripped?'#C0392B':'#1a1a1a','stroke-width':tripped?3.5:2});
+  el('text',{x:x,y:y+h*0.42,'text-anchor':'middle','font-size':fs,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},t1);
+  el('text',{x:x,y:y+h*0.8,'text-anchor':'middle','font-size':tripped?fs:fs-1.5,'font-weight':tripped?700:400,'class':'lbl',fill:tripped?'#C0392B':'#56606b'},tripped?'¡SALTA!':t2);
+}
+function pinza(x,y,ph,col,fs){
+  el('text',{x:x,y:y,'text-anchor':'middle','font-size':fs||12.5,'font-weight':700,'class':'lbl',fill:col||'#C55A11',stroke:'#fff','stroke-width':5,'paint-order':'stroke','stroke-linejoin':'round'},ptxt(ph));
+}
+function scol(mo,on){ return mo.trip?'#C0392B':(on?(mo.fase?'#C0392B':'#2E8B3E'):'#56606b'); }
+function draw(){
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  var g=gen(), nar=svg.parentNode.clientWidth<620;
+  var tot=[0,0,0]; st.mots.forEach(function(m){ var p=phases(m); for(var k=0;k<3;k++) tot[k]+=p[k]; });
+  if(nar) drawNar(g,tot); else drawWide(g,tot);
+  $('vG').innerHTML=g.cal+' A<small>suma '+f(g.sum,1)+' A · '+(g.none?'no hay calibre':'bien: '+g.auto+' A')+'</small>';
+  $('gDown').disabled=g.gi===0; $('gUp').disabled=g.gi===CAL.length-1;
+  $('bAdd').disabled=st.mots.length>=4;
+  plate(); receta(); explain(g,tot);
+}
+function drawWide(g,tot){
+  var n=st.mots.length, W=780, live=tot[1]>0;
+  svg.setAttribute('viewBox','0 0 780 470');
+  el('text',{x:W/2,y:20,'text-anchor':'middle','font-size':14,'class':'lbl',fill:'#1a1a1a'},'Llegada de la red: L1, L2, L3 (400 V)');
+  el('line',{x1:W/2,y1:28,x2:W/2,y2:48,stroke:'#D0191C','stroke-width':4});
+  boxd(W/2,48,230,50,'-Q0  '+g.cal+' A','cable '+f(g.cab[0])+' mm² · aguanta '+f(g.cab[1])+' A',st.gTrip,14);
+  el('line',{x1:W/2,y1:98,x2:W/2,y2:140,stroke:'#D0191C','stroke-width':live?6:4});
+  el('text',{x:W/2+150,y:110,'text-anchor':'middle','font-size':12,'class':'lbl',fill:'#56606b'},'pinza en la general');
+  pinza(W/2+150,126,tot,'#C55A11');
+  var xs=[]; for(var i=0;i<n;i++) xs.push(n===1?W/2:110+i*(W-220)/(n-1));
+  if(n>1) el('line',{x1:xs[0],y1:140,x2:xs[n-1],y2:140,stroke:'#D0191C','stroke-width':4});
+  el('circle',{cx:W/2,cy:140,r:4,fill:'#1a1a1a'});
+  st.mots.forEach(function(mo,i){
+    var x=xs[i], L=line(mo), ph=phases(mo), on=ph[1]>0, c=MCOL[i], sel=i===st.sel;
+    el('line',{x1:x,y1:140,x2:x,y2:350,stroke:'#D0191C','stroke-width':on?5:3});
+    boxd(x,160,168,48,'-Q'+(i+1)+'  '+L.cal+' A · curva '+L.cur,'cable '+f(L.cab[0])+' mm²',mo.trip==='Q');
+    boxd(x,232,168,48,'-F'+(i+1)+' térmico '+rg(L.th),'ruleta '+f(L.ib)+' A',mo.trip==='F');
+    pinza(x,312,ph,c);
+    var gm=el('g',{style:'cursor:pointer'}); gm.addEventListener('click',function(){ st.sel=i; panel(); });
+    el('circle',{cx:x,cy:388,r:36,fill:sel?'#f4f1fb':'#fff',stroke:c,'stroke-width':sel?7:4},undefined,gm);
+    el('text',{x:x,y:386,'text-anchor':'middle','font-size':17,'font-weight':700,'class':'lbl',fill:c},nom(i),gm);
+    el('text',{x:x,y:404,'text-anchor':'middle','font-size':12,'class':'lbl',fill:'#1a1a1a'},P[mo.p][0]+' kW · '+(mo.c==='D'?'Δ':'Y'),gm);
+    el('text',{x:x,y:446,'text-anchor':'middle','font-size':13,'font-weight':700,'class':'lbl',fill:scol(mo,on)},estado(mo));
+    if(!okCon(mo)) el('text',{x:x,y:464,'text-anchor':'middle','font-size':12,'font-weight':700,'class':'lbl',fill:'#C0392B'},'¡caja equivocada!');
+  });
+}
+// móvil: la general, una ficha por motor y, en grande, la línea del motor elegido
+function drawNar(g,tot){
+  var W=470, n=st.mots.length, i=st.sel, mo=st.mots[i], L=line(mo), ph=phases(mo), on=ph[1]>0, c=MCOL[i], live=tot[1]>0, x=W/2, y0=224;
+  svg.setAttribute('viewBox','0 0 470 468');
+  el('text',{x:x,y:17,'text-anchor':'middle','font-size':14,'class':'lbl',fill:'#1a1a1a'},'Red: L1, L2, L3 (400 V)');
+  el('line',{x1:x,y1:22,x2:x,y2:34,stroke:'#D0191C','stroke-width':4});
+  boxd(x,34,340,54,'-Q0  '+g.cal+' A','cable '+f(g.cab[0])+' mm² · aguanta '+f(g.cab[1])+' A',st.gTrip,16);
+  el('line',{x1:x,y1:88,x2:x,y2:126,stroke:'#D0191C','stroke-width':live?6:4});
+  pinza(x,112,tot,'#C55A11',15);
+  var xs=[]; for(var k=0;k<n;k++) xs.push(n===1?x:58+k*(W-116)/(n-1));
+  if(n>1) el('line',{x1:xs[0],y1:126,x2:xs[n-1],y2:126,stroke:'#D0191C','stroke-width':4});
+  st.mots.forEach(function(m,k){
+    var o=phases(m)[1]>0, cc=MCOL[k], sel=k===i;
+    el('line',{x1:xs[k],y1:126,x2:xs[k],y2:144,stroke:'#D0191C','stroke-width':o?5:3});
+    var gm=el('g',{style:'cursor:pointer'}); gm.addEventListener('click',function(){ st.sel=k; panel(); });
+    el('circle',{cx:xs[k],cy:166,r:22,fill:m.trip?'#ffe9e6':(o?(m.fase?'#ffe9e6':'#e3f5e6'):'#fff'),stroke:cc,'stroke-width':sel?7:3},undefined,gm);
+    el('text',{x:xs[k],y:172,'text-anchor':'middle','font-size':15,'font-weight':700,'class':'lbl',fill:cc},'M'+(k+1),gm);
+    el('text',{x:xs[k],y:208,'text-anchor':'middle','font-size':14,'font-weight':700,'class':'lbl',fill:scol(m,o)},m.trip?'¡salta!':(o?(m.fase?'sin fase':'marcha'):'parado'));
+  });
+  el('rect',{x:8,y:y0,width:W-16,height:236,rx:12,fill:'none',stroke:c,'stroke-width':2.5});
+  el('text',{x:22,y:y0+25,'font-size':16,'font-weight':700,'class':'lbl',fill:c},nom(i)+' · '+P[mo.p][0]+' kW · '+(mo.c==='D'?'Δ':'Y'));
+  el('text',{x:W-22,y:y0+25,'text-anchor':'end','font-size':14,'font-weight':700,'class':'lbl',fill:scol(mo,on)},estado(mo));
+  el('line',{x1:x,y1:y0+36,x2:x,y2:y0+200,stroke:'#D0191C','stroke-width':on?5:3});
+  boxd(x,y0+40,320,54,'-Q'+(i+1)+'  '+L.cal+' A · curva '+L.cur,'cable '+f(L.cab[0])+' mm² · aguanta '+f(L.cab[1])+' A',mo.trip==='Q',16);
+  boxd(x,y0+108,320,54,'-F'+(i+1)+' térmico '+rg(L.th),'ruleta '+f(L.ib)+' A',mo.trip==='F',16);
+  pinza(x,y0+190,ph,c,16);
+  el('text',{x:x,y:y0+222,'text-anchor':'middle','font-size':14,'font-weight':700,'class':'lbl',fill:okCon(mo)?'#56606b':'#C0392B'},okCon(mo)?'pinza de '+nom(i):'¡caja equivocada!');
+}
+// ------------ placa
+function plate(){
+  var p=$('plate'); while(p.firstChild) p.removeChild(p.firstChild);
+  var mo=st.mots[st.sel]; if(!mo) return; var pl=P[mo.p], i=st.sel;
+  setH('pTit','Placa de <span style="color:'+MCOL[i]+'">'+nom(i)+'</span> · se conecta en <b>'+(mo.c==='D'?'triángulo (Δ)':'estrella (Y)')+'</b>');
+  function E(t,a,x){ return el(t,a,x,p); }
+  E('rect',{x:4,y:4,width:392,height:222,rx:12,fill:'#d9dde1',stroke:'#5f6b73','stroke-width':2});
+  E('text',{x:20,y:32,'font-size':15,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},'MOTOR   3~   50 Hz');
+  E('text',{x:20,y:62,'font-size':20,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},pl[0]+' kW');
+  E('text',{x:200,y:62,'font-size':14,'class':'lbl',fill:'#1a1a1a'},pl[1]+' r/min   cos φ = '+pl[2]);
+  function bor(x,y,t){ for(var r=0;r<2;r++) for(var k=0;k<3;k++) E('circle',{cx:x+k*13,cy:y+r*13,r:4,fill:'none',stroke:'#222'}); if(t==='Y') E('line',{x1:x,y1:y,x2:x+26,y2:y,stroke:'#222','stroke-width':2}); else for(var k2=0;k2<3;k2++) E('line',{x1:x+k2*13,y1:y,x2:x+k2*13,y2:y+13,stroke:'#222','stroke-width':2}); }
+  [['Y',pl[4],20],['D',pl[3],210]].forEach(function(b){
+    var x=b[2], y=90, chosen=mo.c===b[0], good=b[1][0]===400;
+    E('text',{x:x,y:y+36,'font-size':26,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},b[0]==='D'?'Δ':'Y');
+    bor(x+30,y+18,b[0]);
+    E('rect',{x:x+80,y:y,width:90,height:70,fill:chosen?(good?'#d3f0d8':'#ffd7d2'):'#fff',stroke:chosen?(good?'#2E8B3E':'#C0392B'):'#222','stroke-width':chosen?5:1.5});
+    E('line',{x1:x+80,y1:y+35,x2:x+170,y2:y+35,stroke:'#222'});
+    E('text',{x:x+125,y:y+25,'text-anchor':'middle','font-size':17,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},b[1][0]+' V');
+    E('text',{x:x+125,y:y+60,'text-anchor':'middle','font-size':17,'font-weight':700,'class':'lbl',fill:'#1a1a1a'},f(b[1][1])+' A');
+  });
+  E('text',{x:20,y:200,'font-size':13,'class':'lbl',fill:'#1a1a1a'},'IP 55          Cl. F');
+  var b=box(mo);
+  setH('pNote',okCon(mo)?'<span class="ok">✔</span> Lees la caja <b>'+(mo.c==='D'?'Δ':'Y')+'</b>: <b>'+b[0]+' V – '+f(b[1])+' A</b>. Es la de la red (400 V): este motor pide <b>'+f(b[1])+' A</b>.':
+    '<span class="bad">✘ Caja equivocada:</span> la caja '+(mo.c==='D'?'Δ':'Y')+' es para <b>'+b[0]+' V</b>, y la red es de 400 V. Con 400 V este motor va en <b>'+(mo.c==='D'?'estrella (Y)':'triángulo (Δ)')+'</b> y pide <b>'+f(real(mo))+' A</b>, no '+f(b[1])+' A.');
+}
+// ------------ la receta del motor elegido
+function receta(){
+  var i=st.sel, mo=st.mots[i]; if(!mo) return; var L=line(mo), b=box(mo), pk=KARR*L.ib;
+  var h='<ol style="margin-top:0">';
+  h+='<li><b>Corriente.</b> Se conecta en '+(mo.c==='D'?'triángulo → caja Δ':'estrella → caja Y')+': '+b[0]+' V – '+f(b[1])+' A. <span class="k">I<sub>B</sub> = '+f(L.ib)+' A</span>'+(okCon(mo)?'':' <span class="bad">✘ Esa caja no es la de 400 V: todo lo que sigue sale mal.</span>')+'</li>';
+  h+='<li><b>Relé térmico.</b> El rango que contiene '+f(L.ib)+' A: <b>'+rg(L.th)+'</b>. Ruleta en <b>'+f(L.ib)+' A</b>.</li>';
+  var vale=CAL.filter(function(c){return c>=L.ib&&c<=L.cab[1];});
+  h+='<li><b>Cable.</b> El más fino en el que cabe un calibre: <b>'+f(L.cab[0])+' mm²</b> (aguanta '+f(L.cab[1])+' A).</li>';
+  h+='<li><b>Calibre.</b> Entre '+f(L.ib)+' A y '+f(L.cab[1])+' A '+(vale.length>1?'valen '+vale.join(' A y ')+' A; aquí, el de <b>'+L.cal+' A</b>':'solo cabe el de <b>'+L.cal+' A</b>')+'.</li>';
+  h+='<li><b>Curva.</b> Pico: '+KARR+' · '+f(L.ib)+' = '+f(pk)+' A. Veces: '+f(pk)+' / '+L.cal+' = <b>'+f(L.x,2)+'</b>. '+(L.cur==='C'?'Es menos de 5: vale la <b>curva C</b>.':'Con curva C no vale (5 o más: zona dudosa). Es menos de 10: <b>curva D</b>.')+' Tiempo: columna de '+L.col+' veces, mínimo '+f(L.tmin)+' s; el arranque dura '+f(TARR)+' s, menos ✔</li>';
+  h+='<li><b>Comprobación.</b> I<sub>B</sub> ≤ I<sub>n</sub> ≤ I<sub>z</sub>: <b>'+f(L.ib)+' ≤ '+L.cal+' ≤ '+f(L.cab[1])+'</b> ✔</li></ol>';
+  setH('recT','La receta de <span style="color:'+MCOL[i]+'">'+nom(i)+'</span> ('+P[mo.p][0]+' kW), paso a paso');
+  setH('rec',h);
+}
+// ------------ textos
+function explain(g,tot){
+  var h='', marcha=tot[0]>0||tot[1]>0;
+  if(st.msg) h+='<p>'+st.msg+'</p>';
+  st.mots.forEach(function(m,i){ if(okCon(m)) return; var alta=IB(m)>real(m);
+    h+='<p><span class="bad">✘ '+nom(i)+': caja equivocada.</span> Has leído <b>'+f(IB(m))+' A</b>, pero con 400 V este motor pide <b>'+f(real(m))+' A</b>. '+(alta?'El térmico queda <b>muy alto</b>: si el motor se sobrecarga, no salta y se puede quemar.':'El magnetotérmico y el térmico quedan <b>pequeños</b>: saltan en el funcionamiento normal del motor.')+'</p>'; });
+  if(marcha) h+='<p><b>Pinza en la general:</b> '+ptxt(tot)+(Math.abs(tot[0]-tot[1])>0.05?' <span class="bad">— no son iguales: hay un motor con una fase de menos.</span>':' — iguales: todo simétrico.')+'</p>';
+  if(!h) h='<p>Todo parado. Toca un motor para ver su placa y su receta. Pon motores en <b>Marcha</b> y mira las pinzas; prueba <b>Quitar una fase</b> y <b>Cortocircuito</b>.</p>';
+  setH('now',h);
+  var q='<p style="margin-top:0"><b>En este cuadro:</b> suma = '+st.mots.map(function(m){return f(IB(m));}).join(' + ')+' = <b>'+f(g.sum,2)+' A</b>. ';
+  if(g.none) q+='<span class="bad">Pasa del calibre más grande de la tabla (160 A):</span> este cuadro habría que repartirlo en dos líneas generales.';
+  else {
+    q+='El calibre bueno es <b>'+g.auto+' A</b> (igual o mayor que la suma y mayor que '+g.mx+' A, la línea más grande), con cable de '+f(g.cabAuto[0])+' mm².';
+    if(g.cal<g.auto) q+=' <span class="bad">Ahora está en '+g.cal+' A:'+(g.cal<g.sum?' no cumple I<sub>B</sub> ≤ I<sub>n</sub>. '+(g.sum>g.cal*1.13?'Con todos en marcha, salta.':'Va al límite ('+f(g.sum/g.cal,2)+' veces): todavía no salta, pero saltará en cuanto un motor pida un poco más.'):'')+(g.cal<=g.mx?' No es mayor que '+g.mx+' A: no hay selectividad.':'')+'</span>';
+    else if(g.cal>g.auto) q+=' Ahora está en '+g.cal+' A: funciona, pero es más grande de lo necesario'+(g.cab[0]>g.cabAuto[0]?' y el cable tiene que ser más grueso ('+f(g.cab[0])+' mm²).':' (el cable de '+f(g.cab[0])+' mm² vale igual).');
+  }
+  setH('gNow',q+'</p>');
+  $('verd').textContent=st.corto||(st.gTrip?'-Q0 saltado: todo parado':(marcha?'General: '+ptxt(tot):'Todo parado: pon motores en marcha'));
+}
+// ------------ panel de motores (solo el elegido está desplegado)
+function panel(){
+  var bx=$('mots'); bx.innerHTML='';
+  st.mots.forEach(function(mo,i){
+    var pl=P[mo.p], sel=i===st.sel, d=document.createElement('div'); d.className='mot'+(sel?' sel':''); d.style.borderLeftColor=MCOL[i];
+    var head='<div class="mh"><span style="color:'+MCOL[i]+'">'+nom(i)+'</span><span class="ms">'+pl[0]+' kW · '+(mo.c==='D'?'Δ':'Y')+' · '+estado(mo)+'</span>'+(st.mots.length>1?'<button class="x" aria-label="Quitar motor">✕</button>':'')+'</div>';
+    if(!sel){ d.innerHTML=head; d.onclick=function(){ st.sel=i; panel(); }; }
+    else {
+      var opts=P.map(function(q,j){ return '<option value="'+j+'"'+(j===mo.p?' selected':'')+'>'+q[0]+' kW · '+q[3][0]+'/'+q[4][0]+' V</option>'; }).join('');
+      d.innerHTML=head+'<select aria-label="Placa del motor">'+opts+'</select>'+
+        '<div class="mlab2">¿Qué caja de la placa lees?</div>'+
+        '<div class="seg"><button class="cY'+(mo.c==='Y'?' on':'')+'">Estrella Y<small>'+pl[4][0]+' V · '+f(pl[4][1])+' A</small></button><button class="cD'+(mo.c==='D'?' on':'')+'">Triángulo Δ<small>'+pl[3][0]+' V · '+f(pl[3][1])+' A</small></button></div>'+
+        '<div class="seg" style="margin-top:6px"><button class="on1'+(mo.on?' on':'')+'">'+(mo.on?'Paro':'Marcha')+'</button><button class="fa'+(mo.fase?' on':'')+'">Quitar una fase</button></div>'+
+        '<div class="seg" style="margin-top:6px"><button class="cc red">⚡ Cortocircuito</button><button class="rs">Rearmar</button></div>';
+      d.querySelector('select').onchange=function(){ mo.p=+this.value; mo.c=P[mo.p][4][0]===400?'Y':'D'; reset(mo); st.gOff=0; say(''); panel(); };
+      d.querySelector('.cY').onclick=function(){ mo.c='Y'; reset(mo); st.gOff=0; say(''); panel(); };
+      d.querySelector('.cD').onclick=function(){ mo.c='D'; reset(mo); st.gOff=0; say(''); panel(); };
+      d.querySelector('.on1').onclick=function(){
+        if(mo.trip) say('Pulsa antes <b>Rearmar</b> en '+nom(i)+'.','Rearma antes '+nom(i));
+        else if(st.gTrip) say('Rearma antes la general <b>-Q0</b>.','Rearma antes -Q0');
+        else { mo.on=!mo.on; if(!mo.on) mo.fase=false; say(''); }
+        panel(); };
+      d.querySelector('.fa').onclick=function(){
+        if(!mo.on||mo.trip||st.gTrip) say('Pon antes el motor '+nom(i)+' en marcha.','Pon antes '+nom(i)+' en marcha');
+        else { mo.fase=!mo.fase; if(mo.fase) say('<b>'+nom(i)+' ha perdido una fase</b> (por ejemplo, un tornillo suelto en L1). Mira su pinza: L1 marca 0 A y L2 y L3 suben mucho. El motor zumba y se calienta: su térmico va a saltar.',nom(i)+' sin una fase: L1 marca 0 A; L2 y L3 suben'); else say(''); }
+        panel(); };
+      d.querySelector('.cc').onclick=function(){ shortc(i); panel(); };
+      d.querySelector('.rs').onclick=function(){ reset(mo); say(''); panel(); };
+    }
+    var x=d.querySelector('.x'); if(x) x.onclick=function(e){ e.stopPropagation(); st.mots.splice(i,1); st.sel=Math.min(st.sel,st.mots.length-1); st.gOff=0; say(''); panel(); };
+    bx.appendChild(d);
+  });
+  sig='';
+}
+function reset(mo){ mo.trip=null; mo.on=false; mo.fase=false; mo.h=0; }
+function shortc(i){
+  var mo=st.mots[i], g=gen(), L=line(mo);
+  mo.on=false; mo.fase=false; mo.trip='Q';
+  if(g.cal>L.cal) say('<b>⚡ Cortocircuito en la línea de '+nom(i)+'.</b> Salta solo <b>-Q'+(i+1)+'</b> ('+L.cal+' A). La general ('+g.cal+' A) es más grande y aguanta: <span class="ok">los demás motores siguen funcionando</span>. Esto es la <b>selectividad</b>.','⚡ Salta solo -Q'+(i+1)+': los demás siguen (selectividad)');
+  else { st.gTrip=true; st.mots.forEach(function(m){ m.on=false; m.fase=false; });
+    say('<b>⚡ Cortocircuito en la línea de '+nom(i)+'.</b> <span class="bad">Salta también la general -Q0</span>: su calibre ('+g.cal+' A) no es mayor que el de la línea ('+L.cal+' A). <b>Se para todo el cuadro</b> por la avería de un solo motor: no hay selectividad.','⚡ Salta también -Q0: se para todo (sin selectividad)'); }
+}
+// ------------ tiempo
+function step(dt){
+  var g=gen(), tot=[0,0,0];
+  st.mots.forEach(function(mo,i){
+    var run=mo.on&&!mo.trip&&!st.gTrip, rul=IB(mo), ir=real(mo), alta=rul>ir*1.2;
+    if(run&&(mo.fase||ir>rul*1.02)){
+      mo.h+=dt/(mo.fase?(alta?11:6):5);
+      if(mo.h>=1){ var pf=mo.fase; mo.trip='F'; mo.on=false; mo.fase=false; mo.h=0;
+        if(pf) say('<b>Ha saltado el térmico -F'+(i+1)+'</b>: el motor trabajaba a dos fases y pedía demasiado por L2 y L3.'+(alta?' Ha tardado mucho, porque la ruleta está en '+f(rul)+' A (la caja mal leída) y el motor pide '+f(ir)+' A.':'')+' Busca la fase que falta y pulsa <b>Rearmar</b>.','Ha saltado el térmico -F'+(i+1)+' (faltaba una fase)');
+        else say('<b>Ha saltado el térmico -F'+(i+1)+' en el funcionamiento normal del motor</b>: pide <b>'+f(ir)+' A</b> y la ruleta está en <b>'+f(rul)+' A</b>, la de la caja mal leída. Elige la caja buena y pulsa <b>Rearmar</b>.','Ha saltado -F'+(i+1)+': pide '+f(ir)+' A y la ruleta está en '+f(rul)+' A');
+        panel(); }
+    } else mo.h=Math.max(0,mo.h-dt/10);
+    var p=phases(mo); for(var k=0;k<3;k++) tot[k]+=p[k];
+  });
+  var mx=Math.max(tot[0],tot[1],tot[2]);
+  if(!st.gTrip&&mx>g.cal*1.13){ st.gh+=dt/6; if(st.gh>=1){ st.gTrip=true; st.gh=0; st.mots.forEach(function(m){m.on=false;m.fase=false;});
+    say('<b>Ha saltado la general -Q0</b> (sobrecarga): los motores en marcha pedían '+f(mx,1)+' A y la general es de '+g.cal+' A. <span class="bad">Se ha parado todo.</span> Pulsa <b>Calcularla bien</b> y <b>Rearmar -Q0</b>.','Ha saltado la general -Q0: se ha parado todo'); panel(); } }
+  else st.gh=Math.max(0,st.gh-dt/10);
+}
+$('gDown').onclick=function(){ st.gOff--; say(''); };
+$('gUp').onclick=function(){ st.gOff++; say(''); };
+$('gAuto').onclick=function(){ st.gOff=0; say(''); };
+$('gReset').onclick=function(){ st.gTrip=false; say(''); panel(); };
+$('bAdd').onclick=function(){ if(st.mots.length<4){ var p=[1,5,8,2][st.mots.length]||1; st.mots.push(mk({p:p,c:p<5?'Y':'D'})); st.sel=st.mots.length-1; st.gOff=0; say(''); panel(); } };
+$('bAll').onclick=function(){ if(st.gTrip){ say('Rearma antes la general <b>-Q0</b>.','Rearma antes -Q0'); return; } st.mots.forEach(function(m){ if(!m.trip) m.on=true; }); say(''); panel(); };
+// solo se redibuja cuando cambia algo
+var last=null, sig='';
+function loop(ts){
+  if(last===null) last=ts; var dt=Math.min(0.1,(ts-last)/1000); last=ts; step(dt);
+  var s=JSON.stringify([st.mots.map(function(m){return [m.p,m.c,m.on,m.fase,m.trip];}),st.sel,st.gOff,st.gTrip,st.msg,svg.parentNode.clientWidth<620]);
+  if(s!==sig){ sig=s; draw(); }
+  requestAnimationFrame(loop);
+}
+panel(); draw(); requestAnimationFrame(loop);
+window.__st=st;
+})();
+
+</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    document.querySelectorAll('.t6nav .steps a').forEach(function(a){
+      if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
+    });
+  } catch(e) {}
+})();</script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La regla IB ≤ In ≤ Iz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1560px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:clamp(1.45rem,3vw,2.1rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 16px;max-width:78ch}
+.grid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.3fr) 290px;gap:16px;align-items:start}
+@media (max-width:1250px){.grid{grid-template-columns:minmax(0,0.85fr) minmax(0,1.2fr)}.side{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}}
+@media (max-width:780px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:60vh;min-width:300px}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.explain{min-height:6.5em;font-size:1.08rem;border-left:6px solid var(--flow)}
+.explain .k,.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1;padding:0}
+
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:12px}
+.ctl h3{font-size:1rem;margin:0 0 6px}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.val{text-align:center;font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.val small{display:block;font-size:.8rem;font-weight:400;color:var(--muted)}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 12px;cursor:pointer;user-select:none;-webkit-user-select:none}
+button:hover{border-color:#1F4E79}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+button.go{background:#2E8B3E;color:#fff;border-color:#2E8B3E}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;padding:9px 6px}
+.below{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:860px){.below{grid-template-columns:1fr}}
+.below .wide{grid-column:1 / -1}
+.below > *,.layout > *{min-width:0}
+.card h2{font-size:1.1rem;margin:0 0 8px}
+.card ul,.card ol{margin:6px 0 0;padding-left:22px}
+.card li{margin:4px 0}
+.now{border-left:6px solid var(--flow);font-size:1.06rem;min-height:7em}
+.now .ok{color:var(--ok);font-weight:700}.now .bad{color:var(--warn);font-weight:700}
+.howto{border-left:6px solid #1F4E79}
+.ojo{border-left:6px solid #C55A11}
+.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem;margin-top:6px}
+table.t th,table.t td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+table.t th{background:rgba(46,139,62,.14)}
+.foot{color:var(--muted);font-size:.9rem;margin-top:10px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
+
+
+#svg{max-height:62vh}
+.lbl{font-family:"Atkinson Hyperlegible",Verdana,sans-serif;fill:#1a1a1a}
+.badge rect{rx:10}
+.cb{border-width:3px;padding-top:0;overflow:hidden}
+.cb h3{margin:0 -16px 10px;padding:8px 16px;color:#fff}
+.cR{border-color:#D0191C}.cR h3{background:#D0191C}
+.cK{border-color:#1a1a1a}.cK h3{background:#1a1a1a}
+.cB{border-color:#1F5FBF}.cB h3{background:#1F5FBF}
+:root[data-theme="dark"] .cK{border-color:#8a939c}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cK{border-color:#8a939c}}
+.cR .val{color:#D0191C}.cB .val{color:#1F5FBF}
+:root[data-theme="dark"] .cR .val{color:#ff6b6b} :root[data-theme="dark"] .cB .val{color:#7fb0ff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cR .val{color:#ff6b6b} :root:not([data-theme="light"]) .cB .val{color:#7fb0ff}}
+.cR .val small,.cB .val small{color:var(--muted)}
+table.t tr.hi td{background:#FFF1C2;color:#1a1a1a;font-weight:700}
+
+
+/* --- tira del tema, veredicto bajo el dibujo, móvil y contraste --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:var(--ok)}
+.t6nav .steps a.cur.seen::after{color:#fff}
+@media (max-width:460px){.t6nav .steps{gap:4px}.t6nav .steps a{font-size:.85rem;padding:0 1px}.t6nav .steps a.seen{position:relative}.t6nav .steps a.seen::after{position:absolute;top:1px;right:2px;margin:0;font-size:.62em}}
+.serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
+button,select{min-height:44px}
+input[type=range]{height:44px}
+button:disabled{opacity:.45;cursor:default}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#6fd98a;--warn:#ff8a7a}}
+:root[data-theme="dark"]{--ok:#6fd98a;--warn:#ff8a7a}
+@media (max-width:620px){.crumbs{display:none}}
+@media (max-width:900px){.stick{position:sticky;top:0;z-index:6;box-shadow:0 6px 14px rgba(0,0,0,.22)}.stick #svg{max-height:40vh}}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#ejercicios" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#ejercicios">Ejercicios</a><span class="sep">›</span><a href="index.html#ejercicios">Tema 6</a><span class="sep">›</span><b>T6.5 La regla de oro</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 6"><a class="arr" href="intensidad_calor.html" aria-label="Anterior: T6.4 La intensidad calienta los cables">‹ T6.4</a><span class="where">Tema 6 · 2 de 6</span><a class="arr" href="curvas_disparo.html" aria-label="Siguiente: T6.6 Las curvas de disparo">T6.6 ›</a><div class="steps"><a href="intensidad_calor.html" title="La intensidad calienta los cables">T6.4</a><a href="regla_ib_in_iz.html" class="cur" aria-current="page" title="La regla de oro">T6.5</a><a href="curvas_disparo.html" title="Las curvas de disparo">T6.6</a><a href="arranque_curvas.html" title="El arranque sobre las curvas">T6.7</a><a href="proteger_motor.html" title="Térmico, fusibles y guardamotor">T6.8</a><a href="cuadro_motores.html" title="Un cuadro con varios motores">T6.11</a></div></nav>
+  <h1>La regla de oro: I<sub>B</sub> ≤ I<sub>n</sub> ≤ I<sub>z</sub></h1>
+  <p class="sub">Sirve para <b>comprobar</b> si el magnetotérmico y el cable de un motor están bien elegidos. Cambia el calibre y el cable y mira la regla: si no se cumple, la animación te dice qué subir o qué bajar.</p>
+  <p class="serve">Te sirve para los ejercicios <b>1, 2, 3 y 14</b>.</p>
+
+  <div class="layout">
+    <div class="sheet stick" aria-label="Línea del motor y regla de las tres corrientes">
+      <svg id="svg" viewBox="0 0 760 460" role="img" aria-label="Magnetotérmico, cable y motor, y una regla con IB, In e Iz"></svg>
+    </div>
+    <div class="side">
+      <div class="card ctl cb cR">
+        <h3>1 · El motor (I<sub>B</sub>)</h3>
+        <div class="row"><button id="mDown" aria-label="Motor más pequeño">◀</button><div class="val" id="vMot"></div><button id="mUp" aria-label="Motor más grande">▶</button></div>
+        <p class="foot" style="margin:6px 0 0">Viene de la placa. <b>No se toca.</b></p>
+      </div>
+      <div class="card ctl cb cK">
+        <h3>2 · El magnetotérmico (I<sub>n</sub>)</h3>
+        <div class="row"><button id="qDown" aria-label="Calibre más pequeño">◀</button><div class="val" id="vCal"></div><button id="qUp" aria-label="Calibre más grande">▶</button></div>
+      </div>
+      <div class="card ctl cb cB">
+        <h3>3 · El cable (I<sub>z</sub>)</h3>
+        <div class="row"><button id="cDown" aria-label="Cable más fino">◀</button><div class="val" id="vCab"></div><button id="cUp" aria-label="Cable más grueso">▶</button></div>
+      </div>
+      <div class="card ctl">
+        <div class="seg"><button id="bReto" class="go">Reto: arréglalo</button><button id="bSol">Ver la solución</button></div>
+        <p class="foot" id="retoMsg" style="margin:8px 0 0">Teclas: <kbd>←</kbd> <kbd>→</kbd> calibre · <kbd>F</kbd> <kbd>G</kbd> cable más fino o más grueso</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="below">
+    <div class="card now wide" aria-live="polite"><h2>Qué está pasando</h2><div id="now"></div></div>
+    <div class="card howto">
+      <h2>Para qué sirve</h2>
+      <p style="margin:0">La regla <span class="k">I<sub>B</sub> ≤ I<sub>n</sub> ≤ I<sub>z</sub></span> sirve para <b>comprobar</b> que una línea está bien dimensionada. Se leen dos cosas:</p>
+      <ul>
+        <li><b>I<sub>B</sub> ≤ I<sub>n</sub></b>: el magnetotérmico deja pasar lo que pide el motor. Si no, salta en el funcionamiento normal del consumo.</li>
+        <li><b>I<sub>n</sub> ≤ I<sub>z</sub></b>: el magnetotérmico salta antes de que el cable sufra. Si no, el cable se calienta y nadie lo corta.</li>
+      </ul>
+      <p style="margin:8px 0 0">I<sub>B</sub> sale de la placa del motor: <b>no se cambia</b>. Lo que sí puedes cambiar es el <b>calibre</b> (I<sub>n</sub>) y el <b>cable</b> (I<sub>z</sub>).</p>
+    </div>
+    <div class="card ojo">
+      <h2>Qué consigues al subir o bajar</h2>
+      <table class="t">
+        <tr><th>Si…</th><th>Qué pasa</th></tr>
+        <tr><td><b>Subes I<sub>n</sub></b> (calibre más grande)</td><td>Aguanta más corriente sin saltar. Arregla que salte en el funcionamiento normal, pero protege menos el cable.</td></tr>
+        <tr><td><b>Bajas I<sub>n</sub></b></td><td>Salta antes y protege más. Nunca por debajo de I<sub>B</sub>.</td></tr>
+        <tr><td><b>Subes la sección</b> (cable más grueso)</td><td><b>Sube I<sub>z</sub></b>: el cable aguanta más. Es más caro.</td></tr>
+        <tr><td><b>Bajas la sección</b></td><td><b>Baja I<sub>z</sub></b>: más barato, pero aguanta menos.</td></tr>
+      </table>
+    </div>
+    <div class="card wide">
+      <h2>El calibre máximo de cada cable</h2>
+      <div style="overflow-x:auto"><table class="t" id="tcab"></table></div>
+      <p class="foot">Cada cable admite como mucho el calibre <b>más grande que no pasa de lo que aguanta</b> (I<sub>z</sub>). Con un calibre más pequeño también queda protegido; con uno más grande, no. La fila amarilla es tu cable.</p>
+    </div>
+    <div class="card wide">
+      <h2>Cómo funciona esta animación</h2>
+      <ul>
+        <li>Elige un <b>motor</b>: su corriente (I<sub>B</sub>) sale de la placa y no se puede cambiar.</li>
+        <li>Sube o baja el <b>magnetotérmico</b> y el <b>cable</b> con los botones o con el teclado: <kbd>←</kbd> <kbd>→</kbd> para el calibre y <kbd>F</kbd> <kbd>G</kbd> para el cable.</li>
+        <li>En la regla de abajo verás las tres corrientes. Si están en orden (I<sub>B</sub> ≤ I<sub>n</sub> ≤ I<sub>z</sub>), sale en verde. Si no, la parte que falla sale en rojo.</li>
+        <li>Con <b>Reto</b> te sale una línea mal dimensionada. Se da por buena en cuanto <b>cumple la regla</b>: vale cualquier calibre que quede entre I<sub>B</sub> e I<sub>z</sub>.</li>
+        <li>En la lista de motores están también las corrientes del <b>ejercicio 2</b> (12, 19, 30 y 45 A).</li>
+      </ul>
+    </div>
+  </div>
+
+  <a class="nextbig" href="curvas_disparo.html">Siguiente: T6.6 Las curvas de disparo →</a>
+
+</main>
+<script>
+
+(function(){
+var MOT=[['0,75 kW · Y',1.85],['1,5 kW · Y',3.5],['2,2 kW · Y',4.85],['3 kW · Y',6.4],['4 kW · Y',8.3],['5,5 kW · Δ',11],['ejercicio 2a',12],['7,5 kW · Δ',14.8],['un motor de 16 A',16],['ejercicio 2c',19],['11 kW · Δ',21.5],['15 kW · Δ',28.5],['ejercicio 2b',30],['18,5 kW · Δ',35],['22 kW · Δ',41],['ejercicio 2d',45]];
+var CAL=[6,10,16,20,25,32,40,50,63,80,100,125,160];
+var CAB=[[1.5,16.5],[2.5,23],[4,31],[6,40],[10,54],[16,73],[25,95],[35,119],[50,145],[70,185]];
+var KEYS='Teclas: <kbd>←</kbd> <kbd>→</kbd> calibre · <kbd>F</kbd> <kbd>G</kbd> cable más fino o más grueso';
+var RETO='<b>Reto:</b> esta línea está mal. Arréglala cambiando el calibre y el cable. El motor no se toca.';
+var st={m:7,q:2,c:0,reto:false};
+var $=function(i){return document.getElementById(i);};
+var NS='http://www.w3.org/2000/svg';
+function f(x){ var s=(Math.round(x*100)/100).toString().replace('.',','); return s; }
+function el(tag,attrs,txt){ var e=document.createElementNS(NS,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); if(txt!==undefined) e.textContent=txt; return e; }
+function best(){ var IB=MOT[st.m][1]; var qi=CAL.findIndex(function(c){return c>=IB;}); var In=CAL[qi]; var ci=CAB.findIndex(function(c){return c[1]>=In;}); return {q:qi,c:ci}; } // el cable más fino en el que cabe algún calibre, y ese calibre
+function draw(){
+  var IB=MOT[st.m][1], In=CAL[st.q], S=CAB[st.c][0], Iz=CAB[st.c][1];
+  var ok1=IB<=In, ok2=In<=Iz;
+  var svg=$('svg'); while(svg.firstChild) svg.removeChild(svg.firstChild);
+  var nar=svg.parentNode.clientWidth<620, W=nar?470:760; svg.setAttribute('viewBox','0 0 '+W+' 460');
+  var qx=nar?62:150, bw=nar?96:120, mx=W-(nar?48:120), mr=nar?38:46;
+  var R='#D0191C', B='#1F5FBF', G='#2E8B3E', K='#1a1a1a';
+  // ---- escena: red - magnetotérmico - cable - motor
+  svg.appendChild(el('text',{x:30,y:28,'font-size':15,'class':'lbl','fill':'#56606b'},'La línea que estás comprobando'));
+  svg.appendChild(el('text',{x:nar?6:40,y:105,'font-size':16,'class':'lbl','font-weight':700},'Red'));
+  svg.appendChild(el('line',{x1:nar?42:82,y1:100,x2:qx,y2:100,stroke:R,'stroke-width':4}));
+  // magnetotérmico
+  svg.appendChild(el('rect',{x:qx,y:58,width:bw,height:84,rx:10,fill:'#fff',stroke:K,'stroke-width':2.5}));
+  svg.appendChild(el('text',{x:qx+bw/2,y:84,'text-anchor':'middle','font-size':15,'class':'lbl'},'-Q1'));
+  svg.appendChild(el('text',{x:qx+bw/2,y:118,'text-anchor':'middle','font-size':26,'font-weight':700,'class':'lbl'},In+' A'));
+  svg.appendChild(el('text',{x:qx+bw/2,y:162,'text-anchor':'middle','font-size':14,'class':'lbl','fill':'#56606b'},'calibre: In'));
+  // cable
+  var w=6+Math.sqrt(S)*7;
+  var hot=!ok2;
+  svg.appendChild(el('line',{x1:qx+bw,y1:100,x2:mx-mr,y2:100,stroke:hot?'#E8590C':'#7a8590','stroke-width':w+8,'stroke-linecap':'round'}));
+  svg.appendChild(el('line',{x1:qx+bw,y1:100,x2:mx-mr,y2:100,stroke:'#C46A2B','stroke-width':w,'stroke-linecap':'round'}));
+  svg.appendChild(el('text',{x:(qx+bw+mx-mr)/2,y:100-w/2-16,'text-anchor':'middle','font-size':17,'font-weight':700,'class':'lbl'},'Cable de '+f(S)+' mm²'));
+  svg.appendChild(el('text',{x:(qx+bw+mx-mr)/2,y:100+w/2+26,'text-anchor':'middle','font-size':15,'class':'lbl',fill:B},'aguanta Iz = '+f(Iz)+' A'));
+  if(hot) svg.appendChild(el('text',{x:(qx+bw+mx-mr)/2,y:100+w/2+46,'text-anchor':'middle','font-size':14,'font-weight':700,'class':'lbl',fill:'#C0392B'},nar?'¡se calienta y no salta!':'¡se puede calentar sin que salte nada!'));
+  // motor
+  svg.appendChild(el('circle',{cx:mx,cy:100,r:mr,fill:'#fff',stroke:K,'stroke-width':3}));
+  svg.appendChild(el('text',{x:mx,y:100,'text-anchor':'middle','font-size':22,'font-weight':700,'class':'lbl'},'M'));
+  svg.appendChild(el('text',{x:mx,y:122,'text-anchor':'middle','font-size':15,'class':'lbl'},'3~'));
+  svg.appendChild(el('text',{x:nar?mx-14:mx,y:170,'text-anchor':'middle','font-size':15,'class':'lbl',fill:R},'pide IB = '+f(IB)+' A'));
+  // ---- regla
+  var mn=Math.min(IB,In,Iz), mxv=Math.max(IB,In,Iz), span=Math.max(mxv-mn,mxv*0.25); var maxv=mxv+span*0.3, v0=Math.max(0,mn-span*0.4);
+  var step=[1,2,5,10,20,50].filter(function(s){return (maxv-v0)/s<=(nar?7:12);})[0]||50; v0=Math.floor(v0/step)*step; maxv=Math.ceil(maxv/step)*step;
+  var x0=nar?20:50,x1=W-(nar?20:40),y=330; function X(v){return x0+(x1-x0)*(v-v0)/(maxv-v0);}
+  svg.appendChild(el('text',{x:30,y:222,'font-size':15,'class':'lbl','fill':'#56606b'},'La regla: las tres corrientes en una línea (amperios)'));
+  // zonas
+  if(ok1&&ok2) svg.appendChild(el('rect',{x:X(IB),y:y-14,width:X(Iz)-X(IB),height:28,fill:'rgba(46,139,62,.22)'}));
+  if(!ok1){ svg.appendChild(el('rect',{x:X(In),y:y-14,width:X(IB)-X(In),height:28,fill:'rgba(192,57,43,.30)'})); }
+  if(!ok2){ svg.appendChild(el('rect',{x:X(Iz),y:y-14,width:X(In)-X(Iz),height:28,fill:'rgba(232,89,12,.35)'})); }
+  svg.appendChild(el('line',{x1:x0,y1:y,x2:x1,y2:y,stroke:'#444','stroke-width':2.5}));
+  for(var v=v0;v<=maxv+1e-9;v+=step){ svg.appendChild(el('line',{x1:X(v),y1:y-6,x2:X(v),y2:y+6,stroke:'#444','stroke-width':1.5})); if(Math.abs(X(v)-X(In))>16) svg.appendChild(el('text',{x:X(v),y:y+44,'text-anchor':'middle','font-size':nar?14:12,'class':'lbl',fill:'#56606b'},String(v))); }
+  function mark(v,col,lab,up,dy,anc){
+    svg.appendChild(el('circle',{cx:X(v),cy:y,r:9,fill:col,stroke:'#fff','stroke-width':2}));
+    var ty=up?y-30-dy:y+28+dy;
+    svg.appendChild(el('line',{x1:X(v),y1:y+(up?-10:10),x2:X(v),y2:up?ty+6:ty-16,stroke:col,'stroke-width':1.5}));
+    var tx=el('text',{x:X(v)+(anc==='end'?4:(anc==='start'?-4:0)),y:ty,'text-anchor':anc||'middle','font-size':16,'font-weight':700,'class':'lbl',fill:col},lab); svg.appendChild(tx);
+    var bb=tx.getBBox(); if(bb.x<4) tx.setAttribute('x',+tx.getAttribute('x')+4-bb.x); else if(bb.x+bb.width>W-4) tx.setAttribute('x',+tx.getAttribute('x')-(bb.x+bb.width-W+4));
+  }
+  var close=Math.abs(X(IB)-X(Iz))<(nar?90:110);
+  var ibLeft=IB<=Iz;
+  mark(IB,R,'IB = '+f(IB),true,0,close?(ibLeft?'end':'start'):null);
+  mark(Iz,B,'Iz = '+f(Iz),true,close?34:0,close?(ibLeft?'start':'end'):null);
+  mark(In,K,'In = '+In,false,50);
+  // insignias
+  function badge(x,txt,ok){ var g=el('g',{}); g.appendChild(el('rect',{x:x,y:418,width:190,height:32,rx:9,fill:ok?'#2E8B3E':'#C0392B'})); g.appendChild(el('text',{x:x+95,y:440,'text-anchor':'middle','font-size':17,'font-weight':700,fill:'#fff','class':'lbl'},txt+(ok?'  ✔':'  ✘'))); svg.appendChild(g); }
+  if(nar){badge(30,'IB ≤ In',ok1); badge(W-220,'In ≤ Iz',ok2);} else {badge(170,'IB ≤ In',ok1); badge(400,'In ≤ Iz',ok2);}
+  // valores laterales
+  $('vMot').innerHTML=f(IB)+' A<small>'+MOT[st.m][0]+'</small>';
+  $('vCal').innerHTML=In+' A<small>calibre (I<sub>n</sub>)</small>';
+  $('vCab').innerHTML=f(S)+' mm²<small>aguanta '+f(Iz)+' A</small>';
+  $('mDown').disabled=st.reto||st.m===0; $('mUp').disabled=st.reto||st.m===MOT.length-1;
+  tablaCables(In);
+  $('qDown').disabled=st.q===0; $('qUp').disabled=st.q===CAL.length-1;
+  $('cDown').disabled=st.c===0; $('cUp').disabled=st.c===CAB.length-1;
+  explain(IB,In,S,Iz,ok1,ok2);
+}
+function tablaCables(In){
+  var t='<tr><th>Sección</th><th>Aguanta (I<sub>z</sub>)</th><th>Calibre máximo que lo protege</th></tr>';
+  CAB.forEach(function(c,i){ var mx=CAL.filter(function(q){return q<=c[1];}).pop(), sel=i===st.c;
+    t+='<tr'+(sel?' class="hi"':'')+'><td>'+f(c[0])+' mm²</td><td>'+f(c[1])+' A</td><td><b>'+mx+' A</b>'+(sel?(In>mx?' — el de '+In+' A ya pasa de '+f(c[1])+' A':' — el de '+In+' A vale'):'')+'</td></tr>'; });
+  $('tcab').innerHTML=t;
+}
+function explain(IB,In,S,Iz,ok1,ok2){
+  var h='';
+  if(st.reto&&!(ok1&&ok2)) $('retoMsg').innerHTML=RETO;
+  if(!ok1){
+    h+='<p><span class="bad">✘ I<sub>B</sub> ≤ I<sub>n</sub> no se cumple.</span> El motor pide <b>'+f(IB)+' A</b> y el magnetotérmico es de <b>'+In+' A</b>. Con el motor trabajando normal ya le parece una sobrecarga: <b>saltaría en el funcionamiento normal del motor</b>.</p><p>→ <b>Sube I<sub>n</sub></b> (el calibre) hasta uno igual o mayor que '+f(IB)+' A.</p>';
+  }
+  if(!ok2){
+    var canLower=CAL.some(function(c){return c>=IB&&c<=Iz;});
+    h+='<p><span class="bad">✘ I<sub>n</sub> ≤ I<sub>z</sub> no se cumple.</span> El cable de '+f(S)+' mm² aguanta <b>'+f(Iz)+' A</b>, pero el magnetotérmico deja pasar hasta <b>'+In+' A</b>. Entre '+f(Iz)+' y '+In+' A el cable se calienta y <b>no salta nada</b>.</p>';
+    h+='<p>→ <b>Sube la sección</b> del cable: así <b>sube I<sub>z</sub></b>.'+(canLower&&ok1?' O <b>baja I<sub>n</sub></b> a <b>'+CAL.filter(function(c){return c>=IB&&c<=Iz;})[0]+' A</b>: sigue siendo igual o mayor que I<sub>B</sub> y no pasa de I<sub>z</sub>.':(ok1?' Bajar I<sub>n</sub> no sirve: quedaría por debajo de lo que pide el motor.':''))+'</p>';
+  }
+  if(ok1&&ok2){
+    var b=best(), vale=CAL.filter(function(c){return c>=IB&&c<=Iz;});
+    h+='<p><span class="ok">✔ Se cumple: '+f(IB)+' ≤ '+In+' ≤ '+f(Iz)+'.</span> El magnetotérmico deja pasar lo que pide el motor y salta antes de que el cable sufra.</p>';
+    h+='<p>Con este cable '+(vale.length>1?'valen los calibres de <b>'+vale.slice(0,-1).join(' A</b>, <b>')+' A</b> y <b>'+vale[vale.length-1]+' A</b>: son igual de buenos':'solo cabe el calibre de <b>'+vale[0]+' A</b>')+'. El magnetotérmico protege el <b>cable</b>; al motor lo protege el relé térmico.</p>';
+    if(st.c>b.c) h+='<p>El cable podría ser más fino (<b>'+f(CAB[b.c][0])+' mm²</b>, con un magnetotérmico de '+CAL[b.q]+' A): más barato.</p>';
+    if(st.reto){ st.reto=false; $('retoMsg').innerHTML='<b style="color:var(--ok)">¡Conseguido!</b> Cumple la regla. Pulsa Reto para otro.<br>'+KEYS; $('mDown').disabled=st.m===0; $('mUp').disabled=st.m===MOT.length-1; }
+  }
+  $('now').innerHTML=h;
+}
+function clamp(v,n){return Math.max(0,Math.min(n-1,v));}
+$('mDown').onclick=function(){st.m=clamp(st.m-1,MOT.length);draw();};
+$('mUp').onclick=function(){st.m=clamp(st.m+1,MOT.length);draw();};
+$('qDown').onclick=function(){st.q=clamp(st.q-1,CAL.length);draw();};
+$('qUp').onclick=function(){st.q=clamp(st.q+1,CAL.length);draw();};
+$('cDown').onclick=function(){st.c=clamp(st.c-1,CAB.length);draw();};
+$('cUp').onclick=function(){st.c=clamp(st.c+1,CAB.length);draw();};
+$('bSol').onclick=function(){var b=best();if(st.reto){st.reto=false;$('retoMsg').innerHTML='Esta era una solución (la del cable más fino). Pulsa Reto para otro.<br>'+KEYS;}st.q=b.q;st.c=b.c;draw();};
+$('bReto').onclick=function(){
+  for(var n=0;n<200;n++){
+    st.m=Math.floor(Math.random()*MOT.length); var bb=best(); st.q=clamp(bb.q+Math.floor(Math.random()*5)-2,CAL.length); st.c=clamp(bb.c+Math.floor(Math.random()*5)-2,CAB.length);
+    var IB=MOT[st.m][1],In=CAL[st.q],Iz=CAB[st.c][1]; if(!(IB<=In&&In<=Iz)) break;
+  }
+  st.reto=true; $('retoMsg').innerHTML=RETO; draw();
+};
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT') return;
+  var m={ArrowLeft:'qDown',ArrowRight:'qUp',f:'cDown',F:'cDown',g:'cUp',G:'cUp'}[e.key];
+  if(m){ e.preventDefault(); $(m).click(); }
+});
+window.addEventListener('resize',function(){clearTimeout(window.__rt);window.__rt=setTimeout(draw,120);});
+draw();
+})();
+
+</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#ejercicios';}}});</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    document.querySelectorAll('.t6nav .steps a').forEach(function(a){
+      if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
+    });
+  } catch(e) {}
+})();</script>
+</body>
+</html>
