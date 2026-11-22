@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>T7.12 Busca la avería</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --bg:#EEF1F4; --ink:#1a1a1a; --muted:#56606b;
+  --fase:#D0191C; --neutro:#1F5FBF; --flow:#F2B400; --ok:#2E8B3E; --warn:#C0392B;
+  --panel:#ffffff; --line:#cfd6de; --btn:#ffffff;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+}
+:root[data-theme="dark"]{ --bg:#15191e; --ink:#eef1f4; --muted:#a9b3bd; --panel:#1f252c; --line:#36404b; --btn:#262d35; }
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;font-size:18px;line-height:1.45}
+main{max-width:1560px;margin:0 auto;padding:20px 16px 32px}
+h1{font-size:clamp(1.45rem,3vw,2.1rem);margin:0 0 4px;line-height:1.15}
+h2{font-size:1.1rem;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 16px;max-width:78ch}
+.grid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.3fr) 290px;gap:16px;align-items:start}
+@media (max-width:1250px){.grid{grid-template-columns:minmax(0,0.85fr) minmax(0,1.2fr)}.side{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}}
+@media (max-width:780px){.grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border-radius:10px;border:1px solid var(--line);padding:8px;overflow-x:auto}
+.sheet svg{display:block;width:100%;height:auto;max-height:60vh;min-width:300px}
+.side{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.explain{min-height:6.5em;font-size:1.08rem;border-left:6px solid var(--flow)}
+.explain .k,.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+
+/* barra superior */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
+.tbback:hover,.themebtn:hover{border-color:#1F4E79}
+.crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
+.crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
+.crumbs a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.crumbs .sep{margin:0 6px;opacity:.7}
+.crumbs b{color:var(--ink)}
+.themebtn{flex:none;width:42px;height:36px;border-radius:10px;border:2px solid var(--line);background:transparent;color:var(--ink);font-size:1.15rem;cursor:pointer;line-height:1;padding:0}
+
+
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media (max-width:900px){.layout{grid-template-columns:1fr}}
+.side{display:flex;flex-direction:column;gap:12px}
+.ctl h3{font-size:1rem;margin:0 0 6px}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.val{text-align:center;font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.val small{display:block;font-size:.8rem;font-weight:400;color:var(--muted)}
+button{font:inherit;font-weight:700;border-radius:10px;border:2px solid var(--line);background:var(--btn);color:var(--ink);padding:10px 12px;cursor:pointer;user-select:none;-webkit-user-select:none}
+button:hover{border-color:#1F4E79}
+button:focus-visible{outline:3px solid var(--flow);outline-offset:2px}
+button.on{background:#1F4E79;color:#fff;border-color:#1F4E79}
+button.go{background:#2E8B3E;color:#fff;border-color:#2E8B3E}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;padding:9px 6px}
+.below{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+@media (max-width:860px){.below{grid-template-columns:1fr}}
+.below .wide{grid-column:1 / -1}
+.below > *,.layout > *{min-width:0}
+.card h2{font-size:1.1rem;margin:0 0 8px}
+.card ul,.card ol{margin:6px 0 0;padding-left:22px}
+.card li{margin:4px 0}
+.now{border-left:6px solid var(--flow);font-size:1.06rem;min-height:7em}
+.now .ok{color:var(--ok);font-weight:700}.now .bad{color:var(--warn);font-weight:700}
+.howto{border-left:6px solid #1F4E79}
+.ojo{border-left:6px solid #C55A11}
+.k{background:#FFF1C2;color:#1a1a1a;border-radius:4px;padding:0 4px;font-weight:700}
+table.t{border-collapse:collapse;width:100%;font-size:.95rem;margin-top:6px}
+table.t th,table.t td{border:1px solid var(--line);padding:5px 7px;text-align:left;vertical-align:top}
+table.t th{background:rgba(46,139,62,.14)}
+.foot{color:var(--muted);font-size:.9rem;margin-top:10px}
+kbd{border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-family:inherit;font-size:.85em}
+input[type=range]{width:100%;accent-color:#1F4E79;height:28px}
+
+
+#svg{max-height:62vh}
+.lbl{font-family:"Atkinson Hyperlegible",Verdana,sans-serif}
+.mot{border:2px solid var(--line);border-left-width:8px;border-radius:10px;padding:8px 10px;margin-top:8px;cursor:pointer}
+.mot.sel{box-shadow:0 0 0 3px #1F4E79 inset}
+.mot .mh{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
+.mot select{font:inherit;font-size:.95rem;padding:4px 6px;border-radius:8px;border:2px solid var(--line);background:var(--btn);color:var(--ink);width:100%;margin:6px 0}
+.mot .seg button{padding:6px 4px;font-size:.88rem}
+.mot button.x{padding:2px 9px;font-size:.9rem;min-width:44px}
+.mot .ms{flex:1;text-align:right;font-weight:400;font-size:.88rem;color:var(--muted)}
+.mot .seg button small{display:block;font-weight:400;font-size:.8rem}
+.mlab2{font-size:.85rem;color:var(--muted);font-weight:700;margin:6px 0 4px}
+.card .bad{color:var(--warn);font-weight:700}.card .ok{color:var(--ok);font-weight:700}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+button:disabled{opacity:.45;cursor:default}
+@media (max-width:900px){.layout>.draw{display:contents}.layout .plate{order:3;margin-top:0!important}}
+button.red{background:#C0392B;color:#fff;border-color:#C0392B}
+.plate{padding:10px}
+.plate svg{max-height:34vh}
+.ptit{font-weight:700;margin:0 4px 6px;color:#1a1a1a}
+.pnote{margin:6px 4px 0;font-size:.95rem;color:#1a1a1a}
+.pnote .bad{color:#C0392B;font-weight:700}.pnote .ok{color:#2E8B3E;font-weight:700}
+
+
+/* --- tira del tema, veredicto bajo el dibujo, móvil y contraste --- */
+.t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
+.t6nav a:hover{border-color:#1F4E79}
+.t6nav .where{flex:1;text-align:center;font-weight:700;color:var(--muted);font-size:.95rem}
+.t6nav .steps{flex-basis:100%;display:flex;gap:6px}
+.t6nav .steps a{flex:1;min-width:0;padding:0 2px;font-size:.95rem}
+.t6nav .steps a.cur{background:#1F4E79;border-color:#1F4E79;color:#fff}
+.t6nav a.off{visibility:hidden}
+.t6nav .steps a.seen::after{content:"✓";margin-left:3px;font-size:.78em;color:var(--ok)}
+.t6nav .steps a.cur.seen::after{color:#fff}
+@media (max-width:460px){.t6nav .steps{gap:4px}.t6nav .steps a{font-size:.85rem;padding:0 1px}.t6nav .steps a.seen{position:relative}.t6nav .steps a.seen::after{position:absolute;top:1px;right:2px;margin:0;font-size:.62em}}
+.serve{margin:-8px 0 14px;color:var(--muted);font-size:.95rem}
+.nextbig{display:flex;align-items:center;justify-content:center;margin:18px 0 0;padding:16px;border-radius:12px;background:#1F4E79;color:#fff;font-weight:700;font-size:1.1rem;text-decoration:none;text-align:center}
+.nextbig:hover{background:#163a5c}
+.verd{margin:6px 6px 2px;font-weight:700;font-size:.98rem;line-height:1.25;color:#1a1a1a;min-height:1.3em}
+.tbback,.themebtn{height:44px}.themebtn{width:44px}
+button,select{min-height:44px}
+input[type=range]{height:44px}
+button:disabled{opacity:.45;cursor:default}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#6fd98a;--warn:#ff8a7a}}
+:root[data-theme="dark"]{--ok:#6fd98a;--warn:#ff8a7a}
+@media (max-width:620px){.crumbs{display:none}}
+@media (max-width:900px){.stick{position:sticky;top:0;z-index:6;box-shadow:0 6px 14px rgba(0,0,0,.22)}.stick #svg{max-height:40vh}}
+.simfig{float:right;width:min(320px,48%);margin:0 0 8px 16px}
+.simfig .sheet{padding:6px}
+.simfig .sheet svg{display:block;width:100%;height:auto;min-width:0;max-height:none}
+.simfig figcaption{font-size:.88rem;color:var(--muted);margin-top:4px;text-align:center}
+.sim::after{content:"";display:block;clear:both}
+@media (max-width:620px){.simfig{float:none;width:100%;max-width:340px;margin:0 auto 10px}}
+
+/* ---- Tema 7 ---- */
+.w.dead,.dot.dead{stroke:#A7AFB8}.dot.dead{fill:#A7AFB8}
+.fl{display:none;stroke:#FFE28A;stroke-width:1.5;stroke-linecap:round;stroke-dasharray:.5 15.5;fill:none;pointer-events:none}
+.fl.on{display:inline;animation:corre .9s linear infinite}
+@keyframes corre{to{stroke-dashoffset:-16}}
+@media (prefers-reduced-motion: reduce){.fl.on{animation:none}.hot{animation:none!important}.gira{animation:none!important}}
+.dev .bl-closed{display:none}.dev.closed .bl-open{display:none}.dev.closed .bl-closed{display:inline}
+.hit{fill:transparent;cursor:pointer}.hit:hover{fill:rgba(31,78,121,.08)}
+.hit.pick{fill:rgba(255,210,63,.28);stroke:#B58900;stroke-width:2;stroke-dasharray:5 4}
+.bdg{display:none}.bdg.on{display:inline}
+.mst{font-weight:700}
+.gone{display:none}
+.hot{animation:late 1s ease-in-out infinite}
+@keyframes late{0%,100%{opacity:.25}50%{opacity:.95}}
+.gira{transform-box:fill-box;transform-origin:center;animation:rueda 1.1s linear infinite}
+@keyframes rueda{to{transform:rotate(360deg)}}
+.lista{display:flex;flex-direction:column;gap:6px}
+.lista .grp{font-size:.82rem;font-weight:700;color:var(--muted);margin:8px 0 0;text-transform:uppercase;letter-spacing:.03em}
+.lista button{text-align:left;padding:8px 10px;font-weight:400;font-size:.98rem;line-height:1.2}
+.lista button b{font-weight:700}
+.lista button.on{font-weight:700}
+.marc{font-weight:700;font-size:1rem;color:var(--muted)}
+.now p{margin:0 0 8px}.now p:last-child{margin-bottom:0}
+.pqs p{margin:0}
+
+.layout{grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr)}
+@media (max-width:860px){.layout{grid-template-columns:1fr}}
+#svg{max-height:none;min-width:0;max-width:520px;margin:0 auto}
+@media (min-width:861px){.sheet.linea{position:sticky;top:8px}#svg{max-height:90vh}}
+.pt{cursor:pointer}.pt:hover .bol{stroke-width:3}
+.pz{cursor:pointer}.pz .aro{opacity:.0}.pz:hover .aro,.pz.on .aro{opacity:1}
+body.pinza .pz .aro{opacity:.35}body.pinza .pz.on .aro{opacity:1}
+.apar{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.disp{background:#1b1f24;color:#7CFC9A;border-radius:10px;padding:10px 14px;font-size:2rem;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;min-height:1.6em;line-height:1.2}
+.disp small{display:block;font-size:.8rem;font-weight:400;color:#c9d1d9;text-align:left}
+.hist{margin:8px 0 0;padding:0;list-style:none;font-size:.92rem;max-height:9.5em;overflow:auto}
+.hist li{padding:2px 0;border-bottom:1px dotted var(--line)}
+.bola{display:inline-block;min-width:1.5em;text-align:center;background:#FFD23F;color:#111;border-radius:999px;font-weight:700;padding:0 .3em;border:1px solid #111;font-size:.9em;line-height:1.35}
+.diag button{text-align:left;font-weight:400}
+.diag .seg button{text-align:center;font-weight:700}
+.diag button.mal{opacity:.5;text-decoration:line-through}
+.diag button.bien{background:#2E8B3E;color:#fff;border-color:#2E8B3E;font-weight:700}
+.oper{font-size:1.05rem;border-left:6px solid #6A4C93}
+</style>
+</head>
+<body>
+<main>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 7</a><span class="sep">›</span><b>T7.12 Busca la avería</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 7"><a class="arr" href="averias_protecciones.html" aria-label="Anterior: T7.11 ¿Qué protección salta?">‹ T7.11</a><span class="where">Tema 7 · 2 de 2</span><a class="arr" href="index.html#animaciones" aria-label="Volver a las animaciones">Fin ›</a><div class="steps"><a href="averias_protecciones.html" title="¿Qué protección salta?">T7.11</a><a href="busca_averia.html" class="cur" aria-current="page" title="Busca la avería">T7.12</a></div></nav>
+  <h1>Busca la avería</h1>
+  <p class="sub">La línea de <b>-M3</b> (un motor de 3,5 A) tiene una <b>avería escondida</b>. Lee lo que cuenta el operario, mira qué ha saltado, <b>mide</b> con el polímetro y con la pinza… y di qué avería es.</p>
+  <p class="serve">Te sirve para los <b>Ejercicios 2</b> (bloque E) y para el punto <b>7.12</b> y <b>7.13</b> de los apuntes.</p>
+
+  <div class="layout">
+    <div class="draw">
+      <div class="sheet linea" aria-label="Línea del motor -M3 con los puntos de medida">
+        <svg id="svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 374.4 513.6" role="img" aria-label="Línea del motor -M3: diferencial, magnetotérmico, contactor, relé térmico y motor, con los puntos de medida" font-family="Atkinson Hyperlegible,Verdana,Arial,sans-serif"><text x="158.4" y="15" font-size="12.2" text-anchor="middle" fill="#111111" font-weight="700">L1</text><text x="199.2" y="15" font-size="12.2" text-anchor="middle" fill="#111111" font-weight="700">L2</text><text x="240" y="15" font-size="12.2" text-anchor="middle" fill="#111111" font-weight="700">L3</text><text x="254.4" y="14.2" font-size="9.8" text-anchor="start" fill="#555555">400 V</text><line x1="158.4" y1="21.6" x2="158.4" y2="45.6" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-red p0"/><line x1="199.2" y1="21.6" x2="199.2" y2="45.6" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-red p1"/><line x1="240" y1="21.6" x2="240" y2="45.6" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-red p2"/><g class="dev dif" id="d-Q8"><line x1="158.4" y1="69.6" x2="148.3" y2="48" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-open"/><line x1="158.4" y1="69.6" x2="158.4" y2="45.6" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-closed"/><line x1="158.4" y1="69.6" x2="158.4" y2="98.4" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="161.3" y="42.1" font-size="8.8" text-anchor="start" fill="#111111" class="num">1</text><text x="161.3" y="107.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">2</text><line x1="199.2" y1="69.6" x2="189.1" y2="48" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-open"/><line x1="199.2" y1="69.6" x2="199.2" y2="45.6" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-closed"/><line x1="199.2" y1="69.6" x2="199.2" y2="98.4" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="202.1" y="42.1" font-size="8.8" text-anchor="start" fill="#111111" class="num">3</text><text x="202.1" y="107.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">4</text><line x1="240" y1="69.6" x2="229.9" y2="48" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-open"/><line x1="240" y1="69.6" x2="240" y2="45.6" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-closed"/><line x1="240" y1="69.6" x2="240" y2="98.4" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="242.9" y="42.1" font-size="8.8" text-anchor="start" fill="#111111" class="num">5</text><text x="242.9" y="107.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">6</text><ellipse cx="199.2" cy="81.6" rx="50.9" ry="6.2" fill="none" stroke="#111111" stroke-width="1.7"/><rect x="123.8" y="53.5" width="10.6" height="10.6" fill="white" stroke="#111111" stroke-width="1.7"/><line x1="123.8" y1="58.8" x2="134.4" y2="58.8" stroke="#111111" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="129.1" y1="53.5" x2="129.1" y2="64.1" stroke="#111111" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="134.4" y1="58.8" x2="235.2" y2="58.8" stroke="#111111" stroke-width="1.3" fill="none" stroke-linecap="butt" stroke-linejoin="round" stroke-dasharray="3.8 2.9"/><polyline points="148.3,81.6 129.1,81.6 129.1,64.1" stroke="#111111" stroke-width="1.2" fill="none" stroke-linecap="butt" stroke-linejoin="round" stroke-dasharray="3.8 2.9"/><text x="119.5" y="63" font-size="12.2" text-anchor="end" fill="#111111" font-weight="700" class="name">-Q8</text><text x="119.5" y="74.4" font-size="9.1" text-anchor="end" fill="#555555" font-style="italic" class="tipo">diferencial</text><text x="119.5" y="84.9" font-size="9.1" text-anchor="end" fill="#2E7D32" font-weight="700" class="dato" id="dato-Q8-0">40 A · 30 mA</text></g><line x1="158.4" y1="98.4" x2="158.4" y2="134.4" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-Q8 p0"/><line x1="199.2" y1="98.4" x2="199.2" y2="134.4" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-Q8 p1"/><line x1="240" y1="98.4" x2="240" y2="134.4" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-Q8 p2"/><g class="dev mag" id="d-Q3"><line x1="158.4" y1="158.4" x2="148.3" y2="136.8" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-open"/><line x1="158.4" y1="158.4" x2="158.4" y2="134.4" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-closed"/><line x1="155" y1="131" x2="161.8" y2="137.8" stroke="#111111" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="155" y1="137.8" x2="161.8" y2="131" stroke="#111111" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="158.4" y1="158.4" x2="158.4" y2="163.2" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="152.9" y="163.2" width="11" height="14.9" fill="white" stroke="#111111" stroke-width="1.7"/><polyline points="157.9,163.2 157.9,167.7 160.8,167.7 160.8,173.6 157.9,173.6 157.9,178.1" stroke="#111111" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="158.4" y1="178.1" x2="158.4" y2="181.7" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="152.9" y="181.7" width="11" height="12" fill="white" stroke="#111111" stroke-width="1.7"/><text x="158.4" y="190.2" font-size="7.3" text-anchor="middle" fill="#111111" font-weight="700">I></text><line x1="158.4" y1="193.7" x2="158.4" y2="199.2" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="161.3" y="130.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">1</text><text x="161.3" y="208.7" font-size="8.8" text-anchor="start" fill="#111111" class="num">2</text><line x1="199.2" y1="158.4" x2="189.1" y2="136.8" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-open"/><line x1="199.2" y1="158.4" x2="199.2" y2="134.4" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-closed"/><line x1="195.8" y1="131" x2="202.6" y2="137.8" stroke="#111111" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="195.8" y1="137.8" x2="202.6" y2="131" stroke="#111111" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="199.2" y1="158.4" x2="199.2" y2="163.2" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="193.7" y="163.2" width="11" height="14.9" fill="white" stroke="#111111" stroke-width="1.7"/><polyline points="198.7,163.2 198.7,167.7 201.6,167.7 201.6,173.6 198.7,173.6 198.7,178.1" stroke="#111111" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="199.2" y1="178.1" x2="199.2" y2="181.7" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="193.7" y="181.7" width="11" height="12" fill="white" stroke="#111111" stroke-width="1.7"/><text x="199.2" y="190.2" font-size="7.3" text-anchor="middle" fill="#111111" font-weight="700">I></text><line x1="199.2" y1="193.7" x2="199.2" y2="199.2" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="202.1" y="130.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">3</text><text x="202.1" y="208.7" font-size="8.8" text-anchor="start" fill="#111111" class="num">4</text><line x1="240" y1="158.4" x2="229.9" y2="136.8" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-open"/><line x1="240" y1="158.4" x2="240" y2="134.4" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-closed"/><line x1="236.6" y1="131" x2="243.4" y2="137.8" stroke="#111111" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="236.6" y1="137.8" x2="243.4" y2="131" stroke="#111111" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="240" y1="158.4" x2="240" y2="163.2" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="234.5" y="163.2" width="11" height="14.9" fill="white" stroke="#111111" stroke-width="1.7"/><polyline points="239.5,163.2 239.5,167.7 242.4,167.7 242.4,173.6 239.5,173.6 239.5,178.1" stroke="#111111" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="240" y1="178.1" x2="240" y2="181.7" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="234.5" y="181.7" width="11" height="12" fill="white" stroke="#111111" stroke-width="1.7"/><text x="240" y="190.2" font-size="7.3" text-anchor="middle" fill="#111111" font-weight="700">I></text><line x1="240" y1="193.7" x2="240" y2="199.2" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="242.9" y="130.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">5</text><text x="242.9" y="208.7" font-size="8.8" text-anchor="start" fill="#111111" class="num">6</text><line x1="134.4" y1="147.6" x2="235.2" y2="147.6" stroke="#111111" stroke-width="1.3" fill="none" stroke-linecap="butt" stroke-linejoin="round" stroke-dasharray="3.8 2.9"/><line x1="134.4" y1="142.3" x2="134.4" y2="152.9" stroke="#111111" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="129.6" y="151.8" font-size="12.2" text-anchor="end" fill="#111111" font-weight="700" class="name">-Q3</text><text x="129.6" y="163.2" font-size="9.1" text-anchor="end" fill="#555555" font-style="italic" class="tipo">magnetotérmico</text><text x="129.6" y="173.7" font-size="9.1" text-anchor="end" fill="#2E7D32" font-weight="700" class="dato" id="dato-Q3-0">6 A · curva C</text></g><line x1="158.4" y1="199.2" x2="158.4" y2="242.4" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-Q3 p0"/><line x1="199.2" y1="199.2" x2="199.2" y2="242.4" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-Q3 p1"/><line x1="240" y1="199.2" x2="240" y2="242.4" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-Q3 p2"/><g class="dev km" id="d-KM3"><line x1="158.4" y1="266.4" x2="148.3" y2="244.8" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-open"/><line x1="158.4" y1="266.4" x2="158.4" y2="242.4" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-closed"/><polyline points="158.4,242.4 157.4,242.6 156.6,243 155.9,243.7 155.4,244.6 155.3,245.5 155.4,246.5 155.9,247.4 156.6,248 157.4,248.5 158.4,248.6" stroke="#111111" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="161.3" y="238.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">1</text><text x="161.3" y="275.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">2</text><line x1="199.2" y1="266.4" x2="189.1" y2="244.8" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-open"/><line x1="199.2" y1="266.4" x2="199.2" y2="242.4" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-closed"/><polyline points="199.2,242.4 198.2,242.6 197.4,243 196.7,243.7 196.2,244.6 196.1,245.5 196.2,246.5 196.7,247.4 197.4,248 198.2,248.5 199.2,248.6" stroke="#111111" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="202.1" y="238.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">3</text><text x="202.1" y="275.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">4</text><line x1="240" y1="266.4" x2="229.9" y2="244.8" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-open"/><line x1="240" y1="266.4" x2="240" y2="242.4" stroke="#111111" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="bl-closed"/><polyline points="240,242.4 239,242.6 238.2,243 237.5,243.7 237,244.6 236.9,245.5 237,246.5 237.5,247.4 238.2,248 239,248.5 240,248.6" stroke="#111111" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="242.9" y="238.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">5</text><text x="242.9" y="275.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">6</text><line x1="136.8" y1="255.6" x2="235.2" y2="255.6" stroke="#111111" stroke-width="1.3" fill="none" stroke-linecap="butt" stroke-linejoin="round" stroke-dasharray="3.8 2.9"/><text x="133.2" y="259.8" font-size="12.2" text-anchor="end" fill="#111111" font-weight="700" class="name">-KM3</text></g><line x1="158.4" y1="266.4" x2="158.4" y2="309.6" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-KM3 p0"/><line x1="199.2" y1="266.4" x2="199.2" y2="309.6" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-KM3 p1"/><line x1="240" y1="266.4" x2="240" y2="309.6" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-KM3 p2"/><g class="dev term" id="d-F3"><rect x="152.4" y="309.6" width="12" height="16.8" fill="white" stroke="#111111" stroke-width="1.7"/><polyline points="157.9,309.6 157.9,314.6 160.8,314.6 160.8,321.4 157.9,321.4 157.9,326.4" stroke="#111111" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="161.3" y="306.1" font-size="8.8" text-anchor="start" fill="#111111" class="num">1</text><text x="161.3" y="335.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">2</text><rect x="193.2" y="309.6" width="12" height="16.8" fill="white" stroke="#111111" stroke-width="1.7"/><polyline points="198.7,309.6 198.7,314.6 201.6,314.6 201.6,321.4 198.7,321.4 198.7,326.4" stroke="#111111" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="202.1" y="306.1" font-size="8.8" text-anchor="start" fill="#111111" class="num">3</text><text x="202.1" y="335.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">4</text><rect x="234" y="309.6" width="12" height="16.8" fill="white" stroke="#111111" stroke-width="1.7"/><polyline points="239.5,309.6 239.5,314.6 242.4,314.6 242.4,321.4 239.5,321.4 239.5,326.4" stroke="#111111" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="242.9" y="306.1" font-size="8.8" text-anchor="start" fill="#111111" class="num">5</text><text x="242.9" y="335.9" font-size="8.8" text-anchor="start" fill="#111111" class="num">6</text><line x1="139.2" y1="318" x2="234" y2="318" stroke="#111111" stroke-width="1.2" fill="none" stroke-linecap="butt" stroke-linejoin="round" stroke-dasharray="3.8 2.9"/><text x="134.4" y="318.6" font-size="12.2" text-anchor="end" fill="#111111" font-weight="700" class="name">-F3</text><text x="134.4" y="330" font-size="9.1" text-anchor="end" fill="#555555" font-style="italic" class="tipo">relé térmico</text><text x="134.4" y="340.5" font-size="9.1" text-anchor="end" fill="#2E7D32" font-weight="700" class="dato" id="dato-F3-0">2,5-4 A</text><text x="134.4" y="351.1" font-size="9.1" text-anchor="end" fill="#2E7D32" font-weight="700" class="dato" id="dato-F3-1">ruleta: 3,5 A</text></g><polyline points="158.4,326.4 158.4,387.6 186,413.6" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-F3 p0"/><text x="161.3" y="383.4" font-size="8.8" text-anchor="start" fill="#111111" class="num">U1</text><line x1="199.2" y1="326.4" x2="199.2" y2="410.4" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-F3 p1"/><text x="202.1" y="383.4" font-size="8.8" text-anchor="start" fill="#111111" class="num">V1</text><polyline points="240,326.4 240,387.6 212.4,413.6" stroke="#D0191C" stroke-width="2" fill="none" stroke-linecap="butt" stroke-linejoin="round" class="w z-F3 p2"/><text x="242.9" y="383.4" font-size="8.8" text-anchor="start" fill="#111111" class="num">W1</text><g class="dev mot" id="d-M3"><circle cx="199.2" cy="439.2" r="28.8" fill="white" stroke="#111111" stroke-width="2" class="motc"/><text x="199.2" y="439.6" font-size="15.2" text-anchor="middle" fill="#111111" font-weight="700">M</text><text x="199.2" y="454.7" font-size="10.3" text-anchor="middle" fill="#111111">3~</text><text x="163.2" y="432.6" font-size="12.2" text-anchor="end" fill="#111111" font-weight="700" class="name">-M3</text><text x="163.2" y="444.7" font-size="9.1" text-anchor="end" fill="#2E7D32" font-weight="700" class="dato">1,5 kW · Y</text><text x="163.2" y="455.3" font-size="9.1" text-anchor="end" fill="#2E7D32" font-weight="700" class="dato">3,5 A</text></g><polyline points="228,439.2 268.8,439.2 268.8,492" stroke="#2E8B3E" stroke-width="1.7" fill="none" stroke-linecap="butt" stroke-linejoin="round" stroke-dasharray="5.3 3.4"/><line x1="254.4" y1="492" x2="283.2" y2="492" stroke="#2E8B3E" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="258.7" y1="496.8" x2="278.9" y2="496.8" stroke="#2E8B3E" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="263.5" y1="501.6" x2="274.1" y2="501.6" stroke="#2E8B3E" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/><g class="pt" data-p="A"><circle cx="145.2" cy="127.2" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="145.2" y="131.1" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">A</text></g><g class="pt" data-p="B"><circle cx="186" cy="127.2" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="186" y="131.1" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">B</text></g><g class="pt" data-p="C"><circle cx="226.8" cy="127.2" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="226.8" y="131.1" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">C</text></g><g class="pt" data-p="D"><circle cx="145.2" cy="220.8" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="145.2" y="224.7" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">D</text></g><g class="pt" data-p="E"><circle cx="186" cy="220.8" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="186" y="224.7" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">E</text></g><g class="pt" data-p="F"><circle cx="226.8" cy="220.8" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="226.8" y="224.7" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">F</text></g><g class="pt" data-p="G"><circle cx="145.2" cy="286.8" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="145.2" y="290.7" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">G</text></g><g class="pt" data-p="H"><circle cx="186" cy="286.8" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="186" y="290.7" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">H</text></g><g class="pt" data-p="J"><circle cx="226.8" cy="286.8" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="226.8" y="290.7" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">J</text></g><g class="pt" data-p="K"><circle cx="145.2" cy="380.4" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="145.2" y="384.3" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">K</text></g><g class="pt" data-p="M"><circle cx="186" cy="380.4" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="186" y="384.3" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">M</text></g><g class="pt" data-p="P"><circle cx="226.8" cy="380.4" r="8.6" fill="#FFD23F" stroke="#111111" stroke-width="1.2" class="bol"/><text x="226.8" y="384.3" font-size="11.3" text-anchor="middle" fill="#111111" font-weight="700">P</text></g><g class="pt" data-p="PE"><circle cx="291.6" cy="470.4" r="10.6" fill="#CDEFD3" stroke="#111111" stroke-width="1.2" class="bol"/><text x="291.6" y="473.8" font-size="9.8" text-anchor="middle" fill="#111111" font-weight="700">PE</text></g><g id="flujo"><line x1="158.4" y1="21.6" x2="158.4" y2="45.6" class="fl z-red p0"/><line x1="199.2" y1="21.6" x2="199.2" y2="45.6" class="fl z-red p1"/><line x1="240" y1="21.6" x2="240" y2="45.6" class="fl z-red p2"/><line x1="158.4" y1="98.4" x2="158.4" y2="134.4" class="fl z-Q8 p0"/><line x1="199.2" y1="98.4" x2="199.2" y2="134.4" class="fl z-Q8 p1"/><line x1="240" y1="98.4" x2="240" y2="134.4" class="fl z-Q8 p2"/><line x1="158.4" y1="199.2" x2="158.4" y2="242.4" class="fl z-Q3 p0"/><line x1="199.2" y1="199.2" x2="199.2" y2="242.4" class="fl z-Q3 p1"/><line x1="240" y1="199.2" x2="240" y2="242.4" class="fl z-Q3 p2"/><line x1="158.4" y1="266.4" x2="158.4" y2="309.6" class="fl z-KM3 p0"/><line x1="199.2" y1="266.4" x2="199.2" y2="309.6" class="fl z-KM3 p1"/><line x1="240" y1="266.4" x2="240" y2="309.6" class="fl z-KM3 p2"/><polyline points="158.4,326.4 158.4,387.6 186,413.6" class="fl z-F3 p0"/><line x1="199.2" y1="326.4" x2="199.2" y2="410.4" class="fl z-F3 p1"/><polyline points="240,326.4 240,387.6 212.4,413.6" class="fl z-F3 p2"/></g><g class="bdg" id="bd-Q8"><rect x="257.2" y="62.0" width="58" height="20" rx="5" fill="#C0392B"/><text x="286.2" y="76.0" font-size="11.5" font-weight="700" fill="#fff" text-anchor="middle">SALTADO</text></g><rect class="hit" data-dev="Q8" x="154.8" y="44.4" width="98.4" height="55.2" rx="6"><title>-Q8</title></rect><g class="bdg" id="bd-Q3"><rect x="257.2" y="156.8" width="58" height="20" rx="5" fill="#C0392B"/><text x="286.2" y="170.8" font-size="11.5" font-weight="700" fill="#fff" text-anchor="middle">SALTADO</text></g><rect class="hit" data-dev="Q3" x="154.8" y="133.2" width="98.4" height="67.2" rx="6"><title>-Q3</title></rect><g class="bdg" id="bd-KM3"><rect x="257.2" y="244.4" width="58" height="20" rx="5" fill="#C0392B"/><text x="286.2" y="258.4" font-size="11.5" font-weight="700" fill="#fff" text-anchor="middle">SALTADO</text></g><rect class="hit" data-dev="KM3" x="154.8" y="241.2" width="98.4" height="26.4" rx="6"><title>-KM3</title></rect><g class="bdg" id="bd-F3"><rect x="257.2" y="308.0" width="58" height="20" rx="5" fill="#C0392B"/><text x="286.2" y="322.0" font-size="11.5" font-weight="700" fill="#fff" text-anchor="middle">SALTADO</text></g><rect class="hit" data-dev="F3" x="154.8" y="308.4" width="98.4" height="19.2" rx="6"><title>-F3</title></rect><text id="st-M3" class="mst" x="199.2" y="483.0" font-size="12" text-anchor="middle" fill="#6b7682">parado</text><path id="gi-M3" class="gira" d="M 219.2 425.2 a 7 7 0 1 1 -7 -7" fill="none" stroke="#2E8B3E" stroke-width="2.4" stroke-linecap="round"/><g class="pz" data-k="0"><rect x="143.4" y="333.6" width="30" height="28.799999999999955" fill="transparent"/><ellipse class="aro" cx="158.4" cy="348.0" rx="11" ry="8" fill="none" stroke="#1F4E79" stroke-width="3" stroke-dasharray="4 3"/></g><g class="pz" data-k="1"><rect x="184.2" y="333.6" width="30" height="28.799999999999955" fill="transparent"/><ellipse class="aro" cx="199.2" cy="348.0" rx="11" ry="8" fill="none" stroke="#1F4E79" stroke-width="3" stroke-dasharray="4 3"/></g><g class="pz" data-k="2"><rect x="225.0" y="333.6" width="30" height="28.799999999999955" fill="transparent"/><ellipse class="aro" cx="240.0" cy="348.0" rx="11" ry="8" fill="none" stroke="#1F4E79" stroke-width="3" stroke-dasharray="4 3"/></g><g pointer-events="none"><rect x="7.2" y="462.0" width="117.6" height="46.8" rx="7" fill="#1b1f24"/><text id="sv1" x="13.2" y="476.4" font-size="10.5" fill="#c9d1d9">Toca dos bolitas o un hilo</text><text id="sv2" x="120.0" y="501.6" font-size="24" font-weight="700" fill="#7CFC9A" text-anchor="end">— — —</text></g><g id="puntas" pointer-events="none"><circle id="pr" r="13" fill="none" stroke="#D0191C" stroke-width="3.5" style="display:none"/><circle id="pn" r="13" fill="none" stroke="#111" stroke-width="3.5" style="display:none"/></g></svg>
+        <p class="verd" id="verd" aria-live="polite"></p>
+      </div>
+    </div>
+    <div class="side">
+      <div class="card oper" aria-live="polite"><h2 style="margin-bottom:4px">Lo que cuenta el operario</h2><div id="oper"></div></div>
+      <div class="card ctl">
+        <h3>Mandos</h3>
+        <div class="seg"><button id="bMar" class="go">Marcha</button><button id="bPar" class="red">Paro</button></div>
+        <div class="seg" style="margin-top:8px"><button id="bQ8">Rearmar -Q8</button><button id="bQ3">Rearmar -Q3</button><button id="bF3">RESET -F3</button></div>
+      </div>
+      <div class="card ctl">
+        <h3>Medir</h3>
+        <div class="seg"><button id="tV" class="on">Polímetro · voltios de alterna</button><button id="tA">Pinza amperimétrica</button></div>
+        <p id="como" style="margin:8px 0;font-size:.95rem"></p>
+        <div class="disp" id="disp"><small id="dq">&nbsp;</small><span id="dv">— — —</span></div>
+        <ul class="hist" id="hist" aria-label="Tus medidas"></ul>
+      </div>
+      <div class="card ctl diag">
+        <h3>¿Qué avería es?</h3>
+        <div class="lista" id="diag"></div>
+        <div class="seg" style="margin-top:10px"><button id="bOtra" class="go">Otra avería</button></div>
+        <p class="marc" id="marc" style="margin:10px 0 0"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="below">
+    <div class="card now wide" aria-live="polite"><h2>Qué está pasando</h2><div id="now"></div></div>
+    <div class="card howto wide pqs">
+      <h2>Para qué sirve</h2>
+      <p>Para practicar el orden de siempre: <b>mirar</b> qué ha saltado, <b>pensar</b> qué tipo de avería puede ser, <b>medir</b> de arriba abajo hasta encontrar dónde deja de haber lo que tiene que haber, y solo entonces <b>arreglar</b>.</p>
+    </div>
+    <div class="card howto">
+      <h2>Lo que tiene que marcar</h2>
+      <ul style="margin-top:0">
+        <li>Entre <b>dos fases</b> distintas: 400 V. Entre una fase y <b>PE</b>: 230 V.</li>
+        <li>Entre dos puntos del <b>mismo hilo</b> (uno encima del otro): 0 V. Si hay varios voltios, <b>mal contacto</b>; si hay una tensión alta, entre los dos hay algo <b>abierto</b>.</li>
+        <li><b>20-30 V</b> en un cable sin tensión es una <b>tensión fantasma</b>: cuenta como 0 V.</li>
+        <li>Pinza: las <b>tres fases iguales</b> y no más que la placa (3,5 A).</li>
+      </ul>
+    </div>
+    <div class="card ojo">
+      <h2>Los puntos de medida</h2>
+      <p style="margin:0">Cada fila de letras es el mismo sitio en las tres fases:</p>
+      <ul style="margin-top:4px">
+        <li><span class="bola">A</span> <span class="bola">B</span> <span class="bola">C</span> la entrada de -Q3 (1, 3 y 5).</li>
+        <li><span class="bola">D</span> <span class="bola">E</span> <span class="bola">F</span> la salida de -Q3 (2, 4 y 6), unida a la entrada de -KM3.</li>
+        <li><span class="bola">G</span> <span class="bola">H</span> <span class="bola">J</span> la salida de -KM3 (2, 4 y 6), unida a la entrada de -F3.</li>
+        <li><span class="bola">K</span> <span class="bola">M</span> <span class="bola">P</span> los tornillos U1, V1 y W1 del motor.</li>
+      </ul>
+    </div>
+    <div class="card wide">
+      <h2>Cómo funciona esta animación</h2>
+      <ul style="margin-top:0">
+        <li><b>Polímetro:</b> toca dos bolitas del esquema (primero la punta roja, después la negra). <b>Pinza:</b> toca uno de los tres hilos de la manguera, entre el térmico y el motor.</li>
+        <li>Puedes dar <b>Marcha</b> y <b>Paro</b>, y rearmar lo que haya saltado (también tocándolo en el esquema). Si la avería sigue ahí, volverá a saltar.</li>
+        <li>Cuando lo tengas claro, elige la avería en la lista. Con <b>Otra avería</b> empiezas con una nueva, al azar.</li>
+        <li>El tiempo va acelerado: un térmico de verdad tarda mucho más en saltar.</li>
+      </ul>
+    </div>
+  </div>
+
+  <a class="nextbig" href="index.html#animaciones">Has llegado al final del Tema 7 · Volver a las animaciones →</a>
+</main>
+<script>
+
+(function(){
+var $=function(i){return document.getElementById(i);};
+var LET=[["A", "B", "C"], ["D", "E", "F"], ["G", "H", "J"], ["K", "M", "P"]], QUE=[["el 1 de -Q3", "el 3 de -Q3", "el 5 de -Q3"], ["el 2 de -Q3", "el 4 de -Q3", "el 6 de -Q3"], ["el 2 de -KM3", "el 4 de -KM3", "el 6 de -KM3"], ["el U1 de -M3", "el V1 de -M3", "el W1 de -M3"]], PT={"A": [145.2, 127.2], "B": [186.0, 127.2], "C": [226.8, 127.2], "D": [145.2, 220.8], "E": [186.0, 220.8], "F": [226.8, 220.8], "G": [145.2, 286.8], "H": [186.0, 286.8], "J": [226.8, 286.8], "K": [145.2, 380.4], "M": [186.0, 380.4], "P": [226.8, 380.4], "PE": [291.6, 470.4]};
+var pos={}; LET.forEach(function(f,l){ f.forEach(function(c,k){ pos[c]=[l,k]; }); });
+function B(c){ return '<span class="bola">'+c+'</span>'; }
+function txt(s){ return s.replace(/-(Q|F|KM|M)(\d+)/g,'<b>-$1$2</b>'); }
+var AV=[
+ {id:'sobre', n:'Sobrecarga: el motor pide más de 3,5 A', ini:{ft:true},
+  oper:'«El motor arranca, pero al cabo de un rato se para solo. Está muy caliente.»',
+  pista:'Dale al RESET y a la marcha, y pon la pinza en las tres fases antes de que salte.',
+  como:'Las tensiones están bien en todos los puntos. La pinza marca lo mismo en las tres fases, pero <b>más que la placa</b> (4,4 A frente a 3,5 A). Por eso salta el térmico.',
+  arr:'Buscar qué frena al motor (rodamientos, atasco, demasiada carga). Esperar a que el térmico enfríe y RESET. Nunca subir la ruleta.'},
+ {id:'arriba', n:'Falta de fase: a -Q3 no le llega una fase', ini:{ft:true},
+  oper:'«Le doy a la marcha y el motor zumba, pero no arranca. Luego se para.»',
+  pista:'La pinza te dice qué fase falta. Después mide tensión entre fases en la fila de arriba (entrada de -Q3).',
+  como:'La pinza marca <b>0 A en L2</b> y las otras dos suben. Y ya en la entrada de -Q3 falta esa fase: entre '+B('A')+' y '+B('C')+' hay 400 V, pero con '+B('B')+' no. La avería está <b>aguas arriba</b> (un fusible fundido, un cable suelto…).',
+  arr:'Seguir midiendo hacia arriba hasta encontrar dónde se pierde L2: cambiar el fusible o apretar el cable. Y buscar por qué se fundió.'},
+ {id:'tornillo', n:'Falta de fase: tornillo suelto en -KM3', ini:{ft:true},
+  oper:'«Le doy a la marcha y el motor zumba, pero no arranca. Luego se para.»',
+  pista:'La pinza te dice qué fase falta. Después mide entre fases fila por fila, de arriba abajo, con el contactor dentro.',
+  como:'La pinza marca <b>0 A en L2</b>. En la entrada de -Q3 y en su salida hay 400 V entre las tres parejas: hasta ahí está bien. En la salida de -KM3, '+B('H')+' ya no tiene su fase (marca un valor raro, unos 200 V, que le llega por los bobinados). La fase se pierde <b>en -KM3</b>.',
+  arr:'Sin tensión: apretar el tornillo 4 de -KM3. Si el contacto está quemado, cambiar el contactor.'},
+ {id:'corto', n:'Cortocircuito en la manguera del motor', ini:{q3:false},
+  oper:'«Se oyó un chasquido en el cuadro y el motor se paró de golpe.»',
+  pista:'Mira qué palanca está bajada. ¿Qué pasa si rearmas y das marcha?',
+  como:'Ha saltado <b>-Q3</b>, y de golpe: es su parte magnética. Si se rearma aguanta, pero vuelve a saltar <b>en cuanto entra -KM3</b>: el cortocircuito está aguas abajo del contactor, en la manguera o en el motor.',
+  arr:'<b>No se rearma «a ver si aguanta».</b> Sin tensión: buscar las marcas, medir en continuidad entre fases con el motor desconectado (tiene que marcar OL) y cambiar la manguera.'},
+ {id:'deriv', n:'Derivación a tierra en el motor', ini:{q8:false},
+  oper:'«No ha hecho ruido ni nada: se ha parado. Y si lo vuelvo a poner, salta otra vez.»',
+  pista:'Mira qué palanca está bajada. Es el único aparato que salta cuando la corriente se escapa a tierra.',
+  como:'Ha saltado el <b>diferencial -Q8</b>. Se puede rearmar, pero salta otra vez <b>al dar marcha</b>: la corriente se escapa a tierra en el motor o en su manguera.',
+  arr:'Sin tensión: medir el aislamiento con el megóhmetro entre cada fase y la carcasa y reparar o cambiar lo que esté derivado. Comprobar el cable de tierra.'},
+ {id:'mando', n:'Avería en el mando: el contactor no entra', ini:{},
+  oper:'«Le doy a la marcha y no hace nada. Ni ruido.»',
+  pista:'No ha saltado nada. Da marcha y mide entre fases fila por fila: ¿hasta dónde llega la tensión?',
+  como:'No ha saltado nada y hay 400 V hasta la entrada de -KM3 ('+B('D')+' '+B('E')+' '+B('F')+'), pero en su salida no hay nada: <b>el contactor no entra</b>. La fuerza está bien; la avería está en el <b>mando</b>.',
+  arr:'Revisar el mando (Tema 3): su magnetotérmico, el paro, la marcha, el 95-96 del térmico y la bobina A1-A2 de -KM3.'},
+ {id:'contacto', n:'Mal contacto en un polo de -KM3', ini:{km:true},
+  oper:'«Funciona, pero en el cuadro huele a quemado.»',
+  pista:'Con el motor en marcha, mide entre la entrada y la salida de cada polo de -KM3 (los dos puntos del mismo hilo). ¿Los tres dan 0 V?',
+  como:'No salta nada. La pinza marca un poco menos en <b>L3</b>. Y entre '+B('F')+' y '+B('J')+', que son la entrada y la salida del mismo polo de -KM3, hay <b>8 V</b> en vez de 0 V: en ese polo la corriente pasa mal y se calienta.',
+  arr:'Sin tensión: apretar el tornillo. Si el contacto o el cable están quemados, cambiar el contactor y cortar la punta dañada del cable.'}
+];
+var st, T=[], ok=0, tot=0, modo='V', sel=[], fallos=0;
+function later(ms,fn){ T.push(setTimeout(fn,ms)); }
+function clearT(){ T.forEach(clearTimeout); T=[]; }
+function nueva(f){
+  clearT(); st={f:f,q8:true,q3:true,ft:false,km:false,res:false,seq:0}; for(var k in f.ini) st[k]=f.ini[k];
+  sel=[]; fallos=0; $('hist').innerHTML=''; $('dv').textContent='— — —'; $('dq').innerHTML='&nbsp;';
+  $('sv1').textContent='Toca dos bolitas o un hilo'; $('sv2').textContent='— — —';
+  $('oper').innerHTML='<p style="margin:0">'+f.oper+'</p>';
+  $('now').innerHTML='<p>Empieza por <b>mirar</b>: ¿hay alguna palanca bajada?, ¿ha saltado el térmico? Después, mide.</p>';
+  document.querySelectorAll('#diag button').forEach(function(b){ b.className=''; b.disabled=false; });
+  vigila(); pinta();
+}
+// ---------- qué hay en cada punto: 0,1,2 = esa fase · 'w' = le llega por los bobinados · 'f' = al aire
+function nodos(){
+  var f=st.f.id, N=[[],[],[],[]];
+  for(var k=0;k<3;k++){
+    var v=(f==='arriba'&&k===1)?null:k;                 // lo que llega de arriba
+    N[0][k]=st.q8?v:null;
+    N[1][k]=st.q3?N[0][k]:null;
+    N[2][k]=(st.km&&!(f==='tornillo'&&k===1))?N[1][k]:null;
+    N[3][k]=N[2][k];
+  }
+  var vivas=[0,1,2].filter(function(k){ return N[3][k]!==null; });
+  for(k=0;k<3;k++){
+    if(N[3][k]!==null) continue;
+    var val=vivas.length===2?'w':(vivas.length===1?N[3][vivas[0]]:'f');
+    // todo lo que está unido a ese tornillo del motor, hacia arriba, hasta lo primero que esté abierto
+    N[3][k]=N[2][k]=val;
+    var sube=st.km&&!(f==='tornillo'&&k===1);
+    if(sube){ N[1][k]=val; if(st.q3){ N[0][k]=val; } }
+  }
+  for(var l=0;l<4;l++) for(k=0;k<3;k++) if(N[l][k]===null) N[l][k]='f';
+  return N;
+}
+function vivasMotor(){ var N=nodos(); return [0,1,2].filter(function(k){ return typeof N[3][k]==='number'&&N[3][k]===k; }).length; }
+function marcha(){ return st.km&&vivasMotor()===3; }
+function dos(){ return st.km&&vivasMotor()===2; }
+function fant(a,b){ var s=(a.charCodeAt(0)*7+b.charCodeAt(0)*13+st.seq)%10; return 19+s; }
+function voltios(a,b){
+  if(a===b) return 0;
+  var N=nodos(), pa=a==='PE'?null:pos[a], pb=b==='PE'?null:pos[b];
+  var va=pa?N[pa[0]][pa[1]]:'pe', vb=pb?N[pb[0]][pb[1]]:'pe';
+  var malo=function(p){ return st.f.id==='contacto'&&marcha()&&p&&p[1]===2&&p[0]>=2; };   // aguas abajo del polo que hace mal contacto
+  if(va==='pe'||vb==='pe'){ var o=va==='pe'?vb:va, po=va==='pe'?pb:pa;
+    if(typeof o==='number') return malo(po)?226:230; if(o==='w') return 115; return 8+fant(a,b)%7; }
+  if(typeof va==='number'&&typeof vb==='number'){
+    if(va===vb) return (malo(pa)!==malo(pb))?8:0;
+    return (malo(pa)||malo(pb))?393:400; }
+  if(va==='w'&&vb==='w') return 0;
+  if((va==='w'&&typeof vb==='number')||(vb==='w'&&typeof va==='number')) return 200+(fant(a,b)%5);
+  if(va==='f'&&vb==='f') return 0;
+  return fant(a,b);
+}
+function amperios(k){
+  if(!st.km) return 0; var f=st.f.id, N=nodos();
+  if(marcha()){ if(f==='sobre') return [4.4,4.5,4.4][k]; if(f==='contacto') return [3.6,3.6,3.0][k]; return [3.5,3.4,3.5][k]; }
+  if(dos()) return (typeof N[3][k]==='number'&&N[3][k]===k)?5.3:0;
+  return 0;
+}
+function fmt(x,d){ return x.toFixed(d).replace('.',','); }
+// ---------- lo que pasa solo: disparos
+function vigila(){
+  clearT(); var f=st.f.id;
+  if(st.km&&st.q8&&st.q3&&f==='corto'){ st.q3=false; di('<span class="bad">¡Fogonazo!</span> En cuanto al motor le llega tensión, -Q3 salta otra vez, y al instante.'); return; }
+  if(st.km&&st.q8&&st.q3&&f==='deriv'){ st.q8=false; di('Al motor le llega tensión… y <span class="bad">salta otra vez el diferencial -Q8</span>.'); return; }
+  if(marcha()&&f==='sobre'){ later(11000,function(){ st.ft=true; st.km=false; di('<span class="bad">Ha saltado el térmico -F3</span>: abre su 95-96 y cae -KM3.'); vigila(); pinta(); }); return; }
+  if(dos()){ later(8000,function(){ st.ft=true; st.km=false; di('El motor zumbaba a dos fases y <span class="bad">ha saltado el térmico -F3</span>: cae -KM3.'); vigila(); pinta(); }); return; }
+}
+function di(h){ $('now').innerHTML='<p>'+txt(h)+'</p>'; }
+// ---------- pintar
+function pinta(){
+  var N=nodos(), ZL={red:-1,Q8:0,Q3:1,KM3:2,F3:3};
+  document.querySelectorAll('#svg .w').forEach(function(e){
+    var m=/z-(\w+) p(\d)/.exec(e.getAttribute('class')), l=ZL[m[1]], k=+m[2];
+    var viva=l<0?!(st.f.id==='arriba'&&k===1):(typeof N[l][k]==='number'&&N[l][k]===k);
+    e.classList.toggle('dead',!viva); });
+  document.querySelectorAll('#svg .fl').forEach(function(e){
+    var m=/z-(\w+) p(\d)/.exec(e.getAttribute('class')); e.classList.toggle('on',amperios(+m[2])>0); });
+  $('d-Q8').classList.toggle('closed',st.q8); $('d-Q3').classList.toggle('closed',st.q3); $('d-KM3').classList.toggle('closed',st.km);
+  $('bd-Q8').classList.toggle('on',!st.q8); $('bd-Q3').classList.toggle('on',!st.q3); $('bd-F3').classList.toggle('on',st.ft);
+  var t=$('st-M3'), c=document.querySelector('#d-M3 .motc'), g=$('gi-M3'), e=marcha()?'m':(dos()?'d':'p');
+  t.textContent={m:st.f.id==='sobre'?'en marcha · caliente':'en marcha',d:'ZUMBA',p:'parado'}[e];
+  t.setAttribute('fill',{m:'#2E8B3E',d:'#C0392B',p:'#6b7682'}[e]); c.setAttribute('fill',{m:'#E7F6EA',d:'#FFE3C2',p:'#E6E9ED'}[e]); g.style.display=e==='m'?'':'none';
+  var sal=[]; if(!st.q8) sal.push('-Q8'); if(!st.q3) sal.push('-Q3'); if(st.ft) sal.push('-F3');
+  $('verd').innerHTML=txt((sal.length?'Saltado: '+sal.join(' y ')+'. ':'No hay nada saltado. ')+'-KM3 '+(st.km?'está dentro.':'no está dentro.'));
+  $('bQ8').disabled=st.q8; $('bQ3').disabled=st.q3; $('bF3').disabled=!st.ft;
+  $('marc').textContent=tot?('Averías encontradas: '+ok+' de '+tot):'';
+  document.body.classList.toggle('pinza',modo==='A');
+  $('tV').classList.toggle('on',modo==='V'); $('tA').classList.toggle('on',modo==='A');
+  $('como').innerHTML=modo==='V'?'Toca <b>dos bolitas</b> del esquema: primero la punta roja y después la negra.':'Toca uno de los <b>tres hilos</b> de la manguera, entre el térmico y el motor.';
+  var pr=$('pr'), pn=$('pn');
+  [pr,pn].forEach(function(p,i){ if(modo==='V'&&sel[i]){ p.setAttribute('cx',PT[sel[i]][0]); p.setAttribute('cy',PT[sel[i]][1]); p.style.display=''; } else p.style.display='none'; });
+}
+function apunta(h){ var li=document.createElement('li'); li.innerHTML=h; var H=$('hist'); H.insertBefore(li,H.firstChild); while(H.children.length>12) H.removeChild(H.lastChild); }
+// ---------- medir
+document.querySelectorAll('#svg .pt').forEach(function(p){
+  p.addEventListener('click',function(){ if(modo!=='V'){ modo='V'; sel=[]; }
+    if(sel.length>=2) sel=[]; sel.push(p.dataset.p);
+    if(sel.length===2){ st.seq++; var v=voltios(sel[0],sel[1]);
+      $('dq').innerHTML='Voltios de alterna · entre '+B(sel[0])+' y '+B(sel[1]); $('dv').textContent=v+' V';
+      $('sv1').textContent='V~ entre '+sel[0]+' y '+sel[1]; $('sv2').textContent=v+' V';
+      apunta(B(sel[0])+' – '+B(sel[1])+': <b>'+v+' V</b>'); }
+    else { $('dq').innerHTML='Voltios de alterna · punta roja en '+B(sel[0])+'. Toca otro punto.'; $('dv').textContent='— — —';
+      $('sv1').textContent='V~ · roja en '+sel[0]+': toca otro punto'; $('sv2').textContent='— — —'; }
+    pinta(); });
+});
+document.querySelectorAll('#svg .pz').forEach(function(p){
+  p.addEventListener('click',function(){ modo='A'; sel=[]; var k=+p.dataset.k, a=amperios(k);
+    document.querySelectorAll('#svg .pz').forEach(function(q){ q.classList.toggle('on',q===p); });
+    $('dq').innerHTML='Pinza · hilo de L'+(k+1)+' (manguera de -M3)'; $('dv').textContent=fmt(a,1)+' A';
+    $('sv1').textContent='Pinza en L'+(k+1); $('sv2').textContent=fmt(a,1)+' A';
+    apunta('Pinza en L'+(k+1)+': <b>'+fmt(a,1)+' A</b>'+(st.km?'':' (motor parado)')); pinta(); });
+});
+$('tV').onclick=function(){ modo='V'; sel=[]; pinta(); };
+$('tA').onclick=function(){ modo='A'; sel=[]; pinta(); };
+// ---------- mandos
+function darMarcha(){
+  if(st.km){ di('-KM3 ya está dentro.'); return; }
+  if(st.f.id==='mando'){ di('Pulsas la marcha… y <b>-KM3 no entra</b>. No se oye nada.'); return; }
+  if(st.ft){ di('Pulsas la marcha y -KM3 no entra: el térmico -F3 está saltado y su 95-96 corta el mando. Hay que pulsar <b>RESET</b>.'); return; }
+  st.km=true; var n=vivasMotor();
+  di(n===3?'Entra -KM3 y el motor arranca.':(n===2?'Entra -KM3, pero el motor <span class="bad">zumba y no arranca</span>.':'Entra -KM3 (se oye el golpe), pero al motor no le llega tensión.'));
+  vigila(); pinta();
+}
+$('bMar').onclick=darMarcha;
+$('bPar').onclick=function(){ st.km=false; di('Paro: cae -KM3.'); vigila(); pinta(); };
+function rearma(d){
+  if(d==='Q8'&&!st.q8){ st.q8=true; di('Rearmas el diferencial -Q8'+(st.km&&st.f.id==='deriv'?'…':' y aguanta.')); }
+  else if(d==='Q3'&&!st.q3){ st.q3=true; di('Rearmas -Q3'+(st.km&&st.f.id==='corto'?'…':' y aguanta.')); }
+  else if(d==='F3'&&st.ft){ st.ft=false; di('RESET: el térmico -F3 queda rearmado. Para arrancar hay que dar marcha.'); }
+  else if(d==='KM3'){ if(st.km){ st.km=false; di('Paro: cae -KM3.'); } else { darMarcha(); return; } }
+  else return;
+  vigila(); pinta();
+}
+$('bQ8').onclick=function(){ rearma('Q8'); }; $('bQ3').onclick=function(){ rearma('Q3'); }; $('bF3').onclick=function(){ rearma('F3'); };
+document.querySelectorAll('#svg .hit').forEach(function(h){ h.addEventListener('click',function(){ rearma(h.dataset.dev); }); });
+// ---------- diagnóstico
+(function(){ var D=$('diag'); AV.forEach(function(f){ var b=document.createElement('button'); b.type='button'; b.dataset.id=f.id; b.innerHTML=txt(f.n);
+  b.onclick=function(){ if(st.res) return;
+    if(f.id===st.f.id){ st.res=true; tot++; if(fallos===0) ok++; b.className='bien';
+      $('now').innerHTML='<p><span class="ok">✔ Eso es: '+txt(f.n.charAt(0).toLowerCase()+f.n.slice(1))+'.</span></p><p><b>Cómo se sabía.</b> '+txt(f.como)+'</p><p><b>Cómo se arregla.</b> '+txt(f.arr)+'</p>';
+      $('now').scrollIntoView({behavior:'smooth',block:'nearest'}); pinta(); }
+    else { fallos++; b.className='mal'; b.disabled=true; $('now').innerHTML='<p><span class="bad">✘ No es eso.</span> '+txt(st.f.pista)+'</p>'; } };
+  D.appendChild(b); }); })();
+function otra(){ var c=AV.filter(function(f){ return !st||f.id!==st.f.id; }); nueva(c[Math.floor(Math.random()*c.length)]); }
+$('bOtra').onclick=function(){ if(st&&!st.res&&fallos>0){ tot++; } otra(); };
+var h=parseInt(location.hash.replace('#',''),10);
+if(h>=1&&h<=AV.length) nueva(AV[h-1]); else otra();
+window.__t7={AV:AV,nueva:nueva,voltios:voltios,amperios:amperios,st:function(){return st;},marcha:darMarcha,rearma:rearma};
+})();
+
+</script>
+<script>document.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Backspace'){var t=e.target.tagName;if(t!=='INPUT'&&t!=='TEXTAREA'&&t!=='SELECT'){e.preventDefault();location.href='index.html#animaciones';}}});</script>
+<script>(function(){
+  var b = document.getElementById('themeBtn'), r = document.documentElement;
+  function cur(){ var t = r.getAttribute('data-theme'); if (t) return t;
+    return (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'; }
+  function paint(){ var d = cur() === 'dark'; b.textContent = d ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    b.setAttribute('aria-label', d ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'); b.title = b.getAttribute('aria-label'); }
+  b.addEventListener('click', function(){ var t = cur() === 'dark' ? 'light' : 'dark'; r.setAttribute('data-theme', t);
+    try { localStorage.setItem('tema', t); } catch(e){} paint(); });
+  paint();
+})();</script>
+<script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
+  try {
+    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    document.querySelectorAll('.t6nav .steps a').forEach(function(a){
+      if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
+    });
+  } catch(e) {}
+})();</script>
+</body>
+</html>
