@@ -251,7 +251,7 @@ body.pinza .pz .aro{opacity:.35}body.pinza .pz.on .aro{opacity:1}
     <div class="card wide">
       <h2>Cómo funciona esta animación</h2>
       <ul style="margin-top:0">
-        <li>Con <b>La red</b> eliges entre los 400 V de una fábrica y los 230 V del taller: cambian las tensiones, la corriente del motor y sus protecciones.</li>
+        <li>Con <b>La red</b> eliges entre los 400 V de una fábrica y los 230 V del taller: cambian las tensiones que marca el polímetro; la corriente del motor y sus protecciones son las mismas.</li>
         <li><b>Polímetro:</b> toca dos bolitas del esquema (primero la punta roja, después la negra). <b>Pinza:</b> toca uno de los tres hilos de la manguera, entre el bornero -X1 y el motor.</li>
         <li>Puedes dar <b>Marcha</b> y <b>Paro</b>, y rearmar lo que haya saltado (también tocándolo en el esquema). Si la avería sigue ahí, volverá a saltar.</li>
         <li>Cuando lo tengas claro, elige la avería en la lista. Con <b>Otra avería</b> empiezas con una nueva, al azar.</li>
@@ -274,10 +274,10 @@ var RED={
  '400':{v:'400 V',V:400,VPE:230,W:200,WPE:115,VM:393,PEM:226,I:[3.5,3.4,3.5],IS:[4.4,4.5,4.4],I2:5.3,IC:[3.6,3.6,3.0],d:{},
    nota:'<b>Fábrica:</b> 400 V entre fases, con neutro. El motor, en estrella: 3,5 A.',
    k:{placa:'3,5 A',sob:'4,4 A',v:'400 V',w:'unos 200 V',vpe:'230 V'}},
- '230':{v:'230 V',V:230,VPE:133,W:115,WPE:66,VM:224,PEM:129,I:[6.0,5.9,6.0],IS:[7.5,7.6,7.5],I2:9.0,IC:[6.2,6.2,5.2],
-   d:{'M3-0':'1,5 kW · Δ','M3-1':'6 A','Q3-0':'10 A · curva C','F3-0':'4-6 A','F3-1':'ruleta: 6 A'},
-   nota:'<b>Taller:</b> 230 V entre fases, sin neutro. El mismo motor, en <b>triángulo</b>: pide 6 A, y por eso cambian -Q3 y la ruleta de -F3.',
-   k:{placa:'6 A',sob:'7,5 A',v:'230 V',w:'unos 115 V',vpe:'unos 130 V'}}
+ '230':{v:'230 V',V:230,VPE:133,W:115,WPE:66,VM:224,PEM:129,I:[3.5,3.4,3.5],IS:[4.4,4.5,4.4],I2:5.3,IC:[3.6,3.6,3.0],
+   d:{'M3-0':'Δ · 230 V'},
+   nota:'<b>Taller:</b> 230 V entre fases, sin neutro. El motor va en <b>triángulo</b> y pide la misma corriente, 3,5 A: las protecciones no cambian. Lo que cambia son las tensiones que marca el polímetro.',
+   k:{placa:'3,5 A',sob:'4,4 A',v:'230 V',w:'unos 115 V',vpe:'unos 130 V'}}
 };
 var red='400'; try{ if(localStorage.getItem('red')==='230') red='230'; }catch(e){}
 var BASE={}; document.querySelectorAll('#svg [id^="dato-"]').forEach(function(e){ BASE[e.id.slice(5)]=e.textContent; });

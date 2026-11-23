@@ -227,7 +227,7 @@ button:disabled{opacity:.45;cursor:default}
     <div class="card wide">
       <h2>Cómo funciona esta animación</h2>
       <ul style="margin-top:0">
-        <li>Arriba a la derecha eliges <b>la red</b>: 400 V (una fábrica, como en los apuntes) o 230 V (el taller). Cambian las placas, las ruletas y los calibres; lo que salta en cada avería es lo mismo.</li>
+        <li>Arriba a la derecha eliges <b>la red</b>: 400 V (una fábrica, como en los apuntes) o 230 V (el taller). Los motores piden la misma corriente en las dos, así que las protecciones y lo que salta en cada avería son lo mismo.</li>
         <li>Los cables <b>rojos</b> tienen tensión; los <b>grises</b>, no. Los puntitos claros son la corriente.</li>
         <li>Elige una avería de la lista: aparece marcada con un <b>rayo</b> en el esquema.</li>
         <li><b>Toca la protección</b> que crees que salta. Si crees que no salta ninguna, pulsa «No salta nada».</li>
@@ -249,10 +249,9 @@ var MOT={M1:'KM1',M2:'KM2',M3:'F3',M4:'F4'};      // tramo del que cuelga cada m
 var RED={
  '400':{v:'400 V',nota:'<b>Fábrica:</b> 400 V entre fases, con neutro. Es el cuadro de los apuntes y de los Ejercicios 2.',d:{},
    k:{m3i:'3,5 A',m3s:'4,5 A',q3:'6 A',m1i:'11 A',m1s:'13 A',m1mag:'182 A',m1pz:'16 A · 0 A · 16 A',q7:'16 A',q4:'10 A',q0:'40 A',vpe:'230 V'}},
- '230':{v:'230 V',nota:'<b>Taller:</b> 230 V entre fases, sin neutro. Los motores de 230/400 V van en <b>triángulo</b>: piden más corriente y cambian las ruletas y los calibres. El de 5,5 kW (400/690 V) no se puede conectar a 230 V: aquí -M1 es uno de 3 kW, que en triángulo pide los mismos 11 A. Entre los cuatro suman 42,3 A: la general -Q0 pasa a 50 A y su cable, a 10 mm².',
-   d:{'M1-0':'3 kW · Δ','M1-1':'11 A','Q0-0':'50 A · curva C','cab-1':'cable de 10 mm²','cab-3':'cable de 10 mm²','M2-0':'4 kW · Δ','M2-1':'14,3 A','Q2-0':'14-18 A','Q2-1':'ruleta: 14,3 A',
-      'M3-0':'1,5 kW · Δ','M3-1':'6 A','Q3-0':'10 A · curva C','F3-0':'4-6 A','F3-1':'ruleta: 6 A','M4-0':'3 kW · Δ','M4-1':'11 A','Q4-0':'16 A · curva C','F4-0':'9-13 A','F4-1':'ruleta: 11 A','Q7-0':'20 A · curva C'},
-   k:{m3i:'6 A',m3s:'7,5 A',q3:'10 A',m1i:'11 A',m1s:'13 A',m1mag:'182 A',m1pz:'16 A · 0 A · 16 A',q7:'20 A',q4:'16 A',q0:'50 A',vpe:'unos 130 V'}}
+ '230':{v:'230 V',nota:'<b>Taller:</b> 230 V entre fases, sin neutro. Los motores van en <b>triángulo</b> y son de menos potencia, pero piden <b>la misma corriente</b> que los de la fábrica: no cambia ninguna protección ni ningún cable.',
+   d:{'M1-0':'Δ · 230 V','M2-0':'Δ · 230 V','M3-0':'Δ · 230 V','M4-0':'Δ · 230 V'},
+   k:{m3i:'3,5 A',m3s:'4,5 A',q3:'6 A',m1i:'11 A',m1s:'13 A',m1mag:'182 A',m1pz:'16 A · 0 A · 16 A',q7:'16 A',q4:'10 A',q0:'40 A',vpe:'unos 130 V'}}
 };
 var red='400'; try{ if(localStorage.getItem('red')==='230') red='230'; }catch(e){}
 var BASE={}; document.querySelectorAll('#svg [id^="dato-"]').forEach(function(e){ BASE[e.id.slice(5)]=e.textContent; });
