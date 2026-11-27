@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>T8.11 ¿Qué protección salta?</title>
+<title>T8.12 ¿Qué protección salta?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
@@ -160,6 +160,11 @@ button:disabled{opacity:.45;cursor:default}
 .lista button b{font-weight:700}
 .lista button.on{font-weight:700}
 .marc{font-weight:700;font-size:1rem;color:var(--muted)}
+.mrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px dotted var(--line)}
+.mrow small{display:block;font-size:.8rem;color:var(--muted)}
+.mrow .mb{display:flex;gap:4px;flex:none}.mrow .mb button{min-width:2.5em;padding:6px 8px}
+.mrow.ok .mb button:not(.on){opacity:.35}
+#conmsg{margin:8px 0 0;font-size:.95rem}
 .red .seg button small{display:block;font-weight:400;font-size:.8rem}
 .rednota{margin:8px 0 0;font-size:.92rem;color:var(--muted)}
 .now p{margin:0 0 8px}.now p:last-child{margin-bottom:0}
@@ -175,11 +180,11 @@ button:disabled{opacity:.45;cursor:default}
 </head>
 <body>
 <main>
-  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 8</a><span class="sep">›</span><b>T8.11 ¿Qué protección salta?</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
-  <nav class="t6nav" aria-label="Animaciones del Tema 8"><a class="arr off" href="#" aria-hidden="true" tabindex="-1">‹</a><span class="where">Tema 8 · 1 de 2</span><a class="arr" href="busca_averia.html" aria-label="Siguiente: T8.12 Busca la avería">T8.12 ›</a><div class="steps"><a href="averias_protecciones.html" class="cur" aria-current="page" title="¿Qué protección salta?">T8.11</a><a href="busca_averia.html" title="Busca la avería">T8.12</a></div></nav>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 8</a><span class="sep">›</span><b>T8.12 ¿Qué protección salta?</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 8"><a class="arr off" href="#" aria-hidden="true" tabindex="-1">‹</a><span class="where">Tema 8 · 1 de 2</span><a class="arr" href="busca_averia.html" aria-label="Siguiente: T8.13 Busca la avería">T8.13 ›</a><div class="steps"><a href="averias_protecciones.html" class="cur" aria-current="page" title="¿Qué protección salta?">T8.12</a><a href="busca_averia.html" title="Busca la avería">T8.13</a></div></nav>
   <h1>¿Qué protección salta?</h1>
-  <p class="sub">El cuadro del Tema 8 con sus cuatro motores en marcha. <b>Elige una avería</b>, piensa qué protección va a actuar y <b>tócala en el esquema</b>. Después verás qué salta, qué motores se paran y cuáles siguen.</p>
-  <p class="serve">Te sirve para los <b>Ejercicios 3</b> (bloques B, C y D).</p>
+  <p class="sub">El cuadro del Tema 8. Primero <b>elige la red y conecta cada motor</b> según su placa. Después <b>elige una avería</b>, piensa qué protección va a actuar y <b>tócala en el esquema</b>. Después verás qué salta, qué motores se paran y cuáles siguen.</p>
+  <p class="serve">Te sirve para los puntos <b>8.2</b> y <b>8.12</b> de los apuntes y para los <b>Ejercicios 3</b>.</p>
 
   <div class="layout">
     <div class="draw">
@@ -190,16 +195,19 @@ button:disabled{opacity:.45;cursor:default}
     </div>
     <div class="side">
       <div class="card ctl red">
-        <h3>La red</h3>
-        <div class="seg"><button id="r400" type="button">400 V<small>fábrica</small></button><button id="r230" type="button">230 V<small>taller</small></button></div>
+        <h3>1 · La red y los motores</h3>
+        <div class="seg"><button id="r230" type="button">230 V</button><button id="r400" type="button">400 V</button><button id="r690" type="button">690 V</button></div>
         <p class="rednota" id="rednota"></p>
+        <div id="mots"></div>
+        <p id="conmsg" aria-live="polite"></p>
+        <div class="seg" style="margin-top:8px"><button id="bCon" type="button">Conectarlos por mí</button></div>
       </div>
       <div class="card ctl">
-        <h3>1 · Elige una avería</h3>
+        <h3>2 · Elige una avería</h3>
         <div class="lista" id="lista"></div>
       </div>
       <div class="card ctl">
-        <h3>2 · ¿Qué salta?</h3>
+        <h3>3 · ¿Qué salta?</h3>
         <p style="margin:0 0 8px;font-size:.95rem">Toca el aparato <b>en el esquema</b>, o di que no salta nada.</p>
         <div class="seg"><button id="bNada">No salta nada</button><button id="bVer">Ver la solución</button></div>
         <div class="seg" style="margin-top:8px"><button id="bReset" class="go">Arreglar y rearmar todo</button></div>
@@ -227,7 +235,7 @@ button:disabled{opacity:.45;cursor:default}
     <div class="card wide">
       <h2>Cómo funciona esta animación</h2>
       <ul style="margin-top:0">
-        <li>Arriba a la derecha eliges <b>la red</b>: 400 V (una fábrica, como en los apuntes) o 230 V (el taller). Los motores piden la misma corriente en las dos, así que las protecciones y lo que salta en cada avería son lo mismo.</li>
+        <li>Primero eliges <b>la red</b> (230, 400 o 690 V) y <b>conectas cada motor</b>: busca en su placa la tensión de la red y pulsa <b>Y</b>, <b>Δ</b> o <b>No</b>. Con otra red, los motores son otros.</li>
         <li>Los cables <b>rojos</b> tienen tensión; los <b>grises</b>, no. Los puntitos claros son la corriente.</li>
         <li>Elige una avería de la lista: aparece marcada con un <b>rayo</b> en el esquema.</li>
         <li><b>Toca la protección</b> que crees que salta. Si crees que no salta ninguna, pulsa «No salta nada».</li>
@@ -237,7 +245,7 @@ button:disabled{opacity:.45;cursor:default}
     </div>
   </div>
 
-  <a class="nextbig" href="busca_averia.html">Siguiente: T8.12 Busca la avería →</a>
+  <a class="nextbig" href="busca_averia.html">Siguiente: T8.13 Busca la avería →</a>
 </main>
 <script>
 
@@ -245,29 +253,61 @@ button:disabled{opacity:.45;cursor:default}
 var $=function(i){return document.getElementById(i);};
 var ANC={"F0.1": [292.8, 40.8], "F0.2": [292.8, 62.4], "F0.3": [314.4, 40.8], "F0.4": [314.4, 62.4], "F0.5": [336.0, 40.8], "F0.6": [336.0, 62.4], "Q0.1": [292.8, 96.0], "Q0.2": [292.8, 160.8], "Q0.3": [314.4, 96.0], "Q0.4": [314.4, 160.8], "Q0.5": [336.0, 96.0], "Q0.6": [336.0, 160.8], "Q5.1": [103.2, 309.6], "Q5.2": [103.2, 362.4], "Q5.3": [124.8, 309.6], "Q5.4": [124.8, 362.4], "Q5.5": [146.4, 309.6], "Q5.6": [146.4, 362.4], "Q1.1": [103.2, 424.8], "Q1.2": [103.2, 489.6], "Q1.3": [124.8, 424.8], "Q1.4": [124.8, 489.6], "Q1.5": [146.4, 424.8], "Q1.6": [146.4, 489.6], "KM1.1": [103.2, 518.4], "KM1.2": [103.2, 542.4], "KM1.3": [124.8, 518.4], "KM1.4": [124.8, 542.4], "KM1.5": [146.4, 518.4], "KM1.6": [146.4, 542.4], "M1.U1": [103.2, 655.9], "M1.V1": [124.8, 655.9], "M1.W1": [146.4, 655.9], "M1.PE": [166.8, 727.2], "M1": [124.8, 703.2], "X1.1": [103.2, 626.4], "X1.2": [124.8, 626.4], "X1.3": [146.4, 626.4], "Q6.1": [256.8, 309.6], "Q6.2": [256.8, 362.4], "Q6.3": [278.4, 309.6], "Q6.4": [278.4, 362.4], "Q6.5": [300.0, 309.6], "Q6.6": [300.0, 362.4], "Q2.1": [256.8, 424.8], "Q2.2": [256.8, 489.6], "Q2.3": [278.4, 424.8], "Q2.4": [278.4, 489.6], "Q2.5": [300.0, 424.8], "Q2.6": [300.0, 489.6], "KM2.1": [256.8, 518.4], "KM2.2": [256.8, 542.4], "KM2.3": [278.4, 518.4], "KM2.4": [278.4, 542.4], "KM2.5": [300.0, 518.4], "KM2.6": [300.0, 542.4], "M2.U1": [256.8, 655.9], "M2.V1": [278.4, 655.9], "M2.W1": [300.0, 655.9], "M2.PE": [320.4, 727.2], "M2": [278.4, 703.2], "X1.4": [256.8, 626.4], "X1.5": [278.4, 626.4], "X1.6": [300.0, 626.4], "Q7.1": [487.2, 218.4], "Q7.2": [487.2, 283.2], "Q7.3": [508.8, 218.4], "Q7.4": [508.8, 283.2], "Q7.5": [530.4, 218.4], "Q7.6": [530.4, 283.2], "Q8.1": [487.2, 309.6], "Q8.2": [487.2, 362.4], "Q8.3": [508.8, 309.6], "Q8.4": [508.8, 362.4], "Q8.5": [530.4, 309.6], "Q8.6": [530.4, 362.4], "Q3.1": [410.4, 424.8], "Q3.2": [410.4, 489.6], "Q3.3": [432.0, 424.8], "Q3.4": [432.0, 489.6], "Q3.5": [453.6, 424.8], "Q3.6": [453.6, 489.6], "KM3.1": [410.4, 518.4], "KM3.2": [410.4, 542.4], "KM3.3": [432.0, 518.4], "KM3.4": [432.0, 542.4], "KM3.5": [453.6, 518.4], "KM3.6": [453.6, 542.4], "F3.1": [410.4, 568.8], "F3.2": [410.4, 585.6], "F3.3": [432.0, 568.8], "F3.4": [432.0, 585.6], "F3.5": [453.6, 568.8], "F3.6": [453.6, 585.6], "M3.U1": [410.4, 655.9], "M3.V1": [432.0, 655.9], "M3.W1": [453.6, 655.9], "M3.PE": [474.0, 727.2], "M3": [432.0, 703.2], "X1.7": [410.4, 626.4], "X1.8": [432.0, 626.4], "X1.9": [453.6, 626.4], "Q4.1": [564.0, 424.8], "Q4.2": [564.0, 489.6], "Q4.3": [585.6, 424.8], "Q4.4": [585.6, 489.6], "Q4.5": [607.2, 424.8], "Q4.6": [607.2, 489.6], "KM4.1": [564.0, 518.4], "KM4.2": [564.0, 542.4], "KM4.3": [585.6, 518.4], "KM4.4": [585.6, 542.4], "KM4.5": [607.2, 518.4], "KM4.6": [607.2, 542.4], "F4.1": [564.0, 568.8], "F4.2": [564.0, 585.6], "F4.3": [585.6, 568.8], "F4.4": [585.6, 585.6], "F4.5": [607.2, 568.8], "F4.6": [607.2, 585.6], "M4.U1": [564.0, 655.9], "M4.V1": [585.6, 655.9], "M4.W1": [607.2, 655.9], "M4.PE": [627.6, 727.2], "M4": [585.6, 703.2], "X1.10": [564.0, 626.4], "X1.11": [585.6, 626.4], "X1.12": [607.2, 626.4]}, ZON={"F0": ["red", "F0"], "Q0": ["F0", "Q0"], "Q5": ["Q0", "Q5"], "Q1": ["Q5", "Q1"], "KM1": ["Q1", "KM1"], "Q6": ["Q0", "Q6"], "Q2": ["Q6", "Q2"], "KM2": ["Q2", "KM2"], "Q7": ["Q0", "Q7"], "Q8": ["Q7", "Q8"], "Q3": ["Q8", "Q3"], "KM3": ["Q3", "KM3"], "F3": ["KM3", "F3"], "Q4": ["Q8", "Q4"], "KM4": ["Q4", "KM4"], "F4": ["KM4", "F4"]}, DEV={"F0": [279.6, 37.2, 349.2, 66.0], "Q0": [279.6, 92.4, 349.2, 164.4], "Q5": [90.0, 306.0, 159.6, 366.0], "Q6": [243.6, 306.0, 313.2, 366.0], "Q7": [474.0, 214.8, 543.6, 286.8], "Q8": [474.0, 306.0, 543.6, 366.0], "Q1": [90.0, 421.2, 159.6, 493.2], "Q2": [243.6, 421.2, 313.2, 493.2], "Q3": [397.2, 421.2, 466.8, 493.2], "Q4": [550.8, 421.2, 620.4, 493.2], "KM1": [90.0, 514.8, 159.6, 546.0], "KM2": [243.6, 514.8, 313.2, 546.0], "KM3": [397.2, 514.8, 466.8, 546.0], "KM4": [550.8, 514.8, 620.4, 546.0], "F3": [397.2, 565.2, 466.8, 589.2], "F4": [550.8, 565.2, 620.4, 589.2], "M1": [93.6, 672.0, 156.0, 734.4], "M2": [247.2, 672.0, 309.6, 734.4], "M3": [400.8, 672.0, 463.2, 734.4], "M4": [554.4, 672.0, 616.8, 734.4]};
 var MOT={M1:'KM1',M2:'KM2',M3:'F3',M4:'F4'};      // tramo del que cuelga cada motor
-// ---- las dos redes: la fábrica (400 V, la del papel) y el taller (230 V sin neutro: los motores, en triángulo)
-var RED={
- '400':{v:'400 V',nota:'<b>Fábrica:</b> 400 V entre fases, con neutro. Es el cuadro de los apuntes y de los Ejercicios 3.',d:{},
+// ---- motor + red: cada red (230, 400 o 690 V) trae sus cuatro motores, con su placa. Hay que elegir la conexión.
+var PL={'0,75':['230 V – 3,2 A','400 V – 1,85 A'],'1,5':['230 V – 6,0 A','400 V – 3,5 A'],'2,2':['230 V – 8,4 A','400 V – 4,85 A'],'3':['230 V – 11,0 A','400 V – 6,4 A'],
+  '4':['230 V – 14,3 A','400 V – 8,3 A'],'5,5':['400 V – 11,0 A','690 V – 6,4 A'],'7,5':['400 V – 14,8 A','690 V – 8,6 A'],'11':['400 V – 21,5 A','690 V – 12,4 A']};
+var RED={   // m: motor -> [kW, conexión buena, corriente] · d: rótulos de las protecciones que cambian · k: números de los textos
+ '230':{v:'230 V',nota:'Red de <b>230 V</b> entre fases (como la de nuestro taller, sin neutro).',
+   m:{M1:['3','D','11 A'],M2:['2,2','D','8,4 A'],M3:['0,75','D','3,2 A'],M4:['1,5','D','6 A']},
+   d:{'Q2-1':'ruleta: 8,4 A','F3-1':'ruleta: 3,2 A','F4-1':'ruleta: 6 A'},
+   k:{m3i:'3,2 A',m3s:'4,1 A',q3:'6 A',m1i:'11 A',m1s:'13 A',m1mag:'182 A',m1pz:'16 A · 0 A · 16 A',q7:'16 A',q4:'10 A',q0:'40 A',vpe:'unos 130 V'}},
+ '400':{v:'400 V',nota:'Red de <b>400 V</b> entre fases. Es el cuadro de los apuntes.',
+   m:{M1:['5,5','D','11 A'],M2:['4','Y','8,3 A'],M3:['1,5','Y','3,5 A'],M4:['3','Y','6,4 A']},d:{},
    k:{m3i:'3,5 A',m3s:'4,5 A',q3:'6 A',m1i:'11 A',m1s:'13 A',m1mag:'182 A',m1pz:'16 A · 0 A · 16 A',q7:'16 A',q4:'10 A',q0:'40 A',vpe:'230 V'}},
- '230':{v:'230 V',nota:'<b>Taller:</b> 230 V entre fases, sin neutro. Los motores van en <b>triángulo</b> y son de menos potencia, pero piden <b>la misma corriente</b> que los de la fábrica: no cambia ninguna protección ni ningún cable.',
-   d:{'M1-0':'Δ · 230 V','M2-0':'Δ · 230 V','M3-0':'Δ · 230 V','M4-0':'Δ · 230 V'},
-   k:{m3i:'3,5 A',m3s:'4,5 A',q3:'6 A',m1i:'11 A',m1s:'13 A',m1mag:'182 A',m1pz:'16 A · 0 A · 16 A',q7:'16 A',q4:'10 A',q0:'40 A',vpe:'unos 130 V'}}
+ '690':{v:'690 V',nota:'Red de <b>690 V</b> entre fases.',
+   m:{M1:['11','Y','12,4 A'],M2:['7,5','Y','8,6 A'],M3:['5,5','Y','6,4 A'],M4:['5,5','Y','6,4 A']},
+   d:{'Q1-1':'ruleta: 12,4 A','Q2-1':'ruleta: 8,6 A','Q3-0':'10 A · curva C','F3-0':'6-9 A','F3-1':'ruleta: 6,4 A'},
+   k:{m3i:'6,4 A',m3s:'8 A',q3:'10 A',m1i:'12,4 A',m1s:'14,5 A',m1mag:'182 A',m1pz:'18,5 A · 0 A · 18,5 A',q7:'16 A',q4:'10 A',q0:'40 A',vpe:'unos 400 V'}}
 };
-var red='400'; try{ if(localStorage.getItem('red')==='230') red='230'; }catch(e){}
+var MS=['M1','M2','M3','M4'], NOM={Y:'estrella',D:'triángulo'};
+var red='400'; try{ var _r=localStorage.getItem('red'); if(RED[_r]) red=_r; }catch(e){}
+var CONOK={'230':{},'400':{},'690':{}}, con=CONOK[red];      // qué motores están ya bien conectados en cada red
+function todos(){ return MS.every(function(m){ return con[m]; }); }
 var BASE={}; document.querySelectorAll('#svg [id^="dato-"]').forEach(function(e){ BASE[e.id.slice(5)]=e.textContent; });
 function tk(s){ return s.replace(/\{(\w+)\}/g,function(_,k){ return RED[red].k[k]; }); }
 function rotulos(){
-  for(var id in BASE){ var d=RED[red].d[id]; $('dato-'+id).textContent=d||BASE[id]; }
+  var R=RED[red];
+  for(var id in BASE){ if(/^M\d/.test(id)) continue; $('dato-'+id).textContent=R.d[id]||BASE[id]; }
+  MS.forEach(function(m){ var i=R.m[m]; $('dato-'+m+'-0').textContent=i[0]+' kW'+(con[m]?' · '+(i[1]==='D'?'Δ':'Y'):''); $('dato-'+m+'-1').textContent=con[m]?i[2]:'¿Y o Δ?'; });
   if(st.f&&st.f.q7) $('dato-Q7-0').textContent=tk(st.f.q7);
-  $('redv').textContent=RED[red].v; $('rednota').innerHTML=txt(RED[red].nota);
-  $('r400').classList.toggle('on',red==='400'); $('r230').classList.toggle('on',red==='230');
+  $('redv').textContent=R.v; $('rednota').innerHTML=R.nota+' Mira la placa de cada motor y <b>elige su conexión</b>.';
+  ['230','400','690'].forEach(function(r){ $('r'+r).classList.toggle('on',red===r); });
+  document.querySelectorAll('#mots .mrow').forEach(function(row){ var m=row.dataset.m, i=R.m[m]; row.classList.toggle('ok',!!con[m]);
+    row.querySelectorAll('button').forEach(function(b){ b.disabled=!!con[m]; b.classList.toggle('on',!!con[m]&&b.dataset.c===i[1]); }); });
+  document.querySelectorAll('#lista button').forEach(function(b){ b.disabled=!todos(); });
+  $('bCon').style.display=todos()?'none':'';
+}
+function hazMots(){ var R=RED[red], h='';
+  MS.forEach(function(m){ var i=R.m[m]; h+='<div class="mrow" data-m="'+m+'"><div><b>-'+m+'</b> · '+i[0]+' kW<small>Δ '+PL[i[0]][0]+'<br>Y '+PL[i[0]][1]+'</small></div>'+
+    '<div class="mb"><button type="button" data-c="Y" title="En estrella">Y</button><button type="button" data-c="D" title="En triángulo">Δ</button><button type="button" data-c="X" title="No vale para esta red">No</button></div></div>'; });
+  $('mots').innerHTML=h; $('conmsg').innerHTML='';
+  document.querySelectorAll('#mots button').forEach(function(b){ b.onclick=function(){ conecta(b.parentNode.parentNode.dataset.m,b.dataset.c); }; });
+}
+function conecta(m,c){
+  var R=RED[red], i=R.m[m], v=R.v; if(con[m]) return;
+  if(c===i[1]){ con[m]=true;
+    $('conmsg').innerHTML='<span class="ok">✔ -'+m+', en '+NOM[c]+':</span> los '+v+' de la red están en la caja '+(c==='D'?'Δ':'Y')+' de su placa. Pide <b>'+i[2]+'</b>.'+(todos()?' <b>Los cuatro están conectados: ya puedes elegir una avería.</b>':''); }
+  else if(c==='X') $('conmsg').innerHTML='<span class="bad">✘ Sí vale.</span> Busca en la placa de -'+m+' los '+v+' de la red: están en una de las dos cajas.';
+  else if(c==='D') $('conmsg').innerHTML='<span class="bad">✘ No.</span> En la placa de -'+m+', los '+v+' están en la caja Y. En triángulo cada bobinado recibiría más tensión de la suya: se quemaría.';
+  else $('conmsg').innerHTML='<span class="bad">✘ No.</span> En la placa de -'+m+', los '+v+' están en la caja Δ. En estrella cada bobinado recibiría menos tensión de la suya: no tendría fuerza.';
+  if(todos()&&st.fase==='libre') reset(); else pinta();
 }
 var st, timers=[];
 function nuevo(){ return {open:{},cut:{},trip:{},cae:{},rev:{},hot:null,f:null,fase:'libre',pe:false,ok:0,tot:0}; }
 st=nuevo();
 function later(ms,fn){ timers.push(setTimeout(fn,ms)); }
 function clearT(){ timers.forEach(clearTimeout); timers=[]; }
-function live(z,k){ if(z==='red') return true; var p=ZON[z]; if(st.open[p[1]]) return false; if(st.cut[z]&&st.cut[z].indexOf(k)>=0) return false; return live(p[0],k); }
+function live(z,k){ if(z==='red') return true; var p=ZON[z]; if(st.open[p[1]]) return false; if(p[1].indexOf('KM')===0&&!con['M'+p[1].slice(2)]) return false; if(st.cut[z]&&st.cut[z].indexOf(k)>=0) return false; return live(p[0],k); }
 function fases(m){ var n=0; for(var k=0;k<3;k++) if(live(MOT[m],k)) n++; return n; }
 function estado(m){ var n=fases(m); return n===3?'marcha':(n===2?'dos':'parado'); }
 function aguasArriba(z){ var r=[z]; while(z!=='red'){ z=ZON[z][0]; r.push(z);} return r; }
@@ -285,7 +325,7 @@ function pinta(){
     var g=$('d-'+d); if(!g) continue;
     if(d.charAt(0)==='M'){
       var e=estado(d), t=$('st-'+d), c=g.querySelector('.motc'), gi=$('gi-'+d);
-      var lab={marcha:st.rev[d]?'gira AL REVÉS':'en marcha',dos:'ZUMBA: a dos fases',parado:'parado'}[e];
+      var lab=!con[d]?'sin conectar':{marcha:st.rev[d]?'gira AL REVÉS':'en marcha',dos:'ZUMBA: a dos fases',parado:'parado'}[e];
       t.textContent=lab; t.setAttribute('fill',e==='marcha'?(st.rev[d]?'#C55A11':'#2E8B3E'):(e==='dos'?'#C0392B':'#6b7682'));
       c.setAttribute('fill',e==='marcha'?'#E7F6EA':(e==='dos'?'#FFE3C2':'#E6E9ED'));
       gi.style.display=e==='marcha'?'':'none'; gi.style.animationDirection=st.rev[d]?'reverse':'normal';
@@ -421,16 +461,18 @@ function libre(d){
   $('verd').textContent='';
 }
 function reset(){ clearT(); var ok=st.ok,tot=st.tot; st=nuevo(); st.ok=ok; st.tot=tot; marca(null);
-  $('now').innerHTML='<p>Todo en marcha: los cuatro motores funcionan. Elige una avería de la lista… o toca un aparato del esquema para abrirlo y ver qué se queda sin tensión.</p>';
+  $('now').innerHTML=todos()?'<p>Todo en marcha: los cuatro motores funcionan. Elige una avería de la lista… o toca un aparato del esquema para abrirlo y ver qué se queda sin tensión.</p>':'<p>Los motores están <b>sin conectar</b>. En «La red y los motores», mira la placa de cada uno y la red, y elige su conexión: <b>Y</b> (estrella), <b>Δ</b> (triángulo) o <b>No</b> (no vale para esta red).</p>';
   $('arr').innerHTML='<p style="margin:0">Elige una avería y contesta: aquí verás cómo se comprueba y cómo se arregla.</p>'; $('verd').textContent=''; pinta(); }
 // lista de averías
 function hazLista(){ var L=$('lista'), g=''; L.innerHTML='';
   S.forEach(function(f){ if(f.g!==g){ g=f.g; var h=document.createElement('div'); h.className='grp'; h.textContent=g; L.appendChild(h); }
     var b=document.createElement('button'); b.type='button'; b.dataset.id=f.id; b.innerHTML=txt(f.t); b.onclick=function(){ elegir(f); }; L.appendChild(b); }); }
-hazLista();
-function ponRed(r){ if(r===red) return; red=r; try{ localStorage.setItem('red',r); }catch(e){}
-  var f=st.f; hazLista(); if(f) elegir(f); else reset(); }
-$('r400').onclick=function(){ ponRed('400'); }; $('r230').onclick=function(){ ponRed('230'); };
+hazLista(); hazMots();
+function ponRed(r){ if(r===red) return; red=r; con=CONOK[r]; try{ localStorage.setItem('red',r); }catch(e){}
+  hazMots(); hazLista(); reset(); }
+['230','400','690'].forEach(function(r){ $('r'+r).onclick=function(){ ponRed(r); }; });
+function conectaTodos(){ MS.forEach(function(m){ con[m]=true; }); $('conmsg').innerHTML='Conectados: '+MS.map(function(m){ var i=RED[red].m[m]; return '-'+m+' en '+NOM[i[1]]; }).join(', ')+'.'; reset(); }
+$('bCon').onclick=conectaTodos;
 document.querySelectorAll('#svg .hit').forEach(function(h){
   h.addEventListener('click',function(){ var d=h.dataset.dev;
     if(st.fase==='pregunta'){ if(d.charAt(0)==='M'||d.indexOf('KM')===0){ return; } resolver(d); }
@@ -442,8 +484,8 @@ $('bReset').onclick=reset;
 // el punto caliente del mal contacto usa el halo de la marca
 var _p=pinta; pinta=function(){ _p(); $('mkh').style.display=(st.f&&(st.fase==='pregunta'||st.hot))?'':'none'; };
 reset();
-var h=parseInt(location.hash.replace('#',''),10); if(h>=1&&h<=S.length) elegir(S[h-1]);
-window.__t7={S:S,elegir:elegir,resolver:resolver,st:function(){return st;},estado:estado,ponRed:ponRed,red:function(){return red;}};
+var h=parseInt(location.hash.replace('#',''),10); if(h>=1&&h<=S.length){ conectaTodos(); elegir(S[h-1]); }
+window.__t7={S:S,elegir:elegir,resolver:resolver,st:function(){return st;},estado:estado,ponRed:ponRed,red:function(){return red;},conecta:conecta,conectaTodos:conectaTodos,todos:todos,RED:RED};
 })();
 
 </script>

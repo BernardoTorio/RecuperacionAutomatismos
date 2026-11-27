@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>T8.12 Busca la avería</title>
+<title>T8.13 Busca la avería</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
@@ -160,6 +160,11 @@ button:disabled{opacity:.45;cursor:default}
 .lista button b{font-weight:700}
 .lista button.on{font-weight:700}
 .marc{font-weight:700;font-size:1rem;color:var(--muted)}
+.mrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-top:1px dotted var(--line)}
+.mrow small{display:block;font-size:.8rem;color:var(--muted)}
+.mrow .mb{display:flex;gap:4px;flex:none}.mrow .mb button{min-width:2.5em;padding:6px 8px}
+.mrow.ok .mb button:not(.on){opacity:.35}
+#conmsg{margin:8px 0 0;font-size:.95rem}
 .red .seg button small{display:block;font-weight:400;font-size:.8rem}
 .rednota{margin:8px 0 0;font-size:.92rem;color:var(--muted)}
 .now p{margin:0 0 8px}.now p:last-child{margin-bottom:0}
@@ -187,11 +192,11 @@ body.pinza .pz .aro{opacity:.35}body.pinza .pz.on .aro{opacity:1}
 </head>
 <body>
 <main>
-  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 8</a><span class="sep">›</span><b>T8.12 Busca la avería</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
-  <nav class="t6nav" aria-label="Animaciones del Tema 8"><a class="arr" href="averias_protecciones.html" aria-label="Anterior: T8.11 ¿Qué protección salta?">‹ T8.11</a><span class="where">Tema 8 · 2 de 2</span><a class="arr" href="index.html#animaciones" aria-label="Volver a las animaciones">Fin ›</a><div class="steps"><a href="averias_protecciones.html" title="¿Qué protección salta?">T8.11</a><a href="busca_averia.html" class="cur" aria-current="page" title="Busca la avería">T8.12</a></div></nav>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 8</a><span class="sep">›</span><b>T8.13 Busca la avería</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 8"><a class="arr" href="averias_protecciones.html" aria-label="Anterior: T8.12 ¿Qué protección salta?">‹ T8.12</a><span class="where">Tema 8 · 2 de 2</span><a class="arr" href="index.html#animaciones" aria-label="Volver a las animaciones">Fin ›</a><div class="steps"><a href="averias_protecciones.html" title="¿Qué protección salta?">T8.12</a><a href="busca_averia.html" class="cur" aria-current="page" title="Busca la avería">T8.13</a></div></nav>
   <h1>Busca la avería</h1>
-  <p class="sub">La línea de <b>-M3</b> (un motor de <span id="subI">3,5 A</span>) tiene una <b>avería escondida</b>. Lee lo que cuenta el operario, mira qué ha saltado, <b>mide</b> con el polímetro y con la pinza… y di qué avería es.</p>
-  <p class="serve">Te sirve para los <b>Ejercicios 3</b> (bloque E) y para el punto <b>8.12</b> y <b>8.13</b> de los apuntes.</p>
+  <p class="sub">Cada vez te toca <b>un motor y una red</b>. Primero <b>elige la conexión</b> del motor. Después, la línea tiene una <b>avería escondida</b>: lee lo que cuenta el operario, mira qué ha saltado, <b>mide</b> con el polímetro y con la pinza… y di qué avería es.</p>
+  <p class="serve">Te sirve para los <b>Ejercicios 3</b> y para los puntos <b>8.2</b>, <b>8.13</b> y <b>8.14</b> de los apuntes.</p>
 
   <div class="layout">
     <div class="draw">
@@ -202,9 +207,10 @@ body.pinza .pz .aro{opacity:.35}body.pinza .pz.on .aro{opacity:1}
     </div>
     <div class="side">
       <div class="card ctl red">
-        <h3>La red</h3>
-        <div class="seg"><button id="r400" type="button">400 V<small>fábrica</small></button><button id="r230" type="button">230 V<small>taller</small></button></div>
-        <p class="rednota" id="rednota"></p>
+        <h3>1 · El motor y la red</h3>
+        <p class="rednota" id="rednota" style="margin-top:0"></p>
+        <div class="seg" id="conex"><button id="cY" type="button">Estrella<small>Y</small></button><button id="cD" type="button">Triángulo<small>Δ</small></button><button id="cX" type="button">No vale<small>para esta red</small></button></div>
+        <p id="conmsg" aria-live="polite"></p>
       </div>
       <div class="card oper" aria-live="polite"><h2 style="margin-bottom:4px">Lo que cuenta el operario</h2><div id="oper"></div></div>
       <div class="card ctl">
@@ -251,7 +257,7 @@ body.pinza .pz .aro{opacity:.35}body.pinza .pz.on .aro{opacity:1}
     <div class="card wide">
       <h2>Cómo funciona esta animación</h2>
       <ul style="margin-top:0">
-        <li>Con <b>La red</b> eliges entre los 400 V de una fábrica y los 230 V del taller: cambian las tensiones que marca el polímetro; la corriente del motor y sus protecciones son las mismas.</li>
+        <li>Lo primero es <b>el motor y la red</b>: busca en la placa la tensión de la red (230, 400 o 690 V) y elige <b>estrella</b>, <b>triángulo</b> o <b>no vale</b>. Si ese motor no vale para esa red, se cambia por otro que sí.</li>
         <li><b>Polímetro:</b> toca dos bolitas del esquema (primero la punta roja, después la negra). <b>Pinza:</b> toca uno de los tres hilos de la manguera, entre el bornero -X1 y el motor.</li>
         <li>Puedes dar <b>Marcha</b> y <b>Paro</b>, y rearmar lo que haya saltado (también tocándolo en el esquema). Si la avería sigue ahí, volverá a saltar.</li>
         <li>Cuando lo tengas claro, elige la avería en la lista. Con <b>Otra avería</b> empiezas con una nueva, al azar.</li>
@@ -269,29 +275,51 @@ var $=function(i){return document.getElementById(i);};
 var LET=[["A", "B", "C"], ["D", "E", "F"], ["G", "H", "J"], ["K", "M", "P"]], QUE=[["el 1 de -Q3", "el 3 de -Q3", "el 5 de -Q3"], ["el 2 de -Q3", "el 4 de -Q3", "el 6 de -Q3"], ["el 2 de -KM3", "el 4 de -KM3", "el 6 de -KM3"], ["el U1 de -M3", "el V1 de -M3", "el W1 de -M3"]], PT={"A": [145.2, 127.2], "B": [186.0, 127.2], "C": [226.8, 127.2], "D": [145.2, 220.8], "E": [186.0, 220.8], "F": [226.8, 220.8], "G": [145.2, 286.8], "H": [186.0, 286.8], "J": [226.8, 286.8], "K": [145.2, 456.7], "M": [186.0, 456.7], "P": [226.8, 456.7], "PE": [291.6, 535.2]};
 var pos={}; LET.forEach(function(f,l){ f.forEach(function(c,k){ pos[c]=[l,k]; }); });
 function B(c){ return '<span class="bola">'+c+'</span>'; }
-// ---- las dos redes: la fábrica (400 V, la del papel) y el taller (230 V sin neutro: el motor, en triángulo)
-var RED={
- '400':{v:'400 V',V:400,VPE:230,W:200,WPE:115,VM:393,PEM:226,I:[3.5,3.4,3.5],IS:[4.4,4.5,4.4],I2:5.3,IC:[3.6,3.6,3.0],d:{},
-   nota:'<b>Fábrica:</b> 400 V entre fases, con neutro. El motor, en estrella: 3,5 A.',
-   k:{placa:'3,5 A',sob:'4,4 A',v:'400 V',w:'unos 200 V',vpe:'230 V'}},
- '230':{v:'230 V',V:230,VPE:133,W:115,WPE:66,VM:224,PEM:129,I:[3.5,3.4,3.5],IS:[4.4,4.5,4.4],I2:5.3,IC:[3.6,3.6,3.0],
-   d:{'M3-0':'Δ · 230 V'},
-   nota:'<b>Taller:</b> 230 V entre fases, sin neutro. El motor va en <b>triángulo</b> y pide la misma corriente, 3,5 A: las protecciones no cambian. Lo que cambia son las tensiones que marca el polímetro.',
-   k:{placa:'3,5 A',sob:'4,4 A',v:'230 V',w:'unos 115 V',vpe:'unos 130 V'}}
-};
-var red='400'; try{ if(localStorage.getItem('red')==='230') red='230'; }catch(e){}
-var BASE={}; document.querySelectorAll('#svg [id^="dato-"]').forEach(function(e){ BASE[e.id.slice(5)]=e.textContent; });
-function tk(s){ return s.replace(/\{(\w+)\}/g,function(_,k){ return RED[red].k[k]; }); }
+// ---- motor + red: cada avería trae un motor (su placa) y una red (230, 400 o 690 V). Lo primero es elegir la conexión.
+var PL={'1,5':['230/400 V','230 V – 6,0 A','400 V – 3,5 A'],'5,5':['400/690 V','400 V – 11,0 A','690 V – 6,4 A']};
+var RED={'230':{V:230,VPE:133,W:115,WPE:66,VM:224,PEM:129,vpe:'unos 130 V',w:'unos 115 V'},
+         '400':{V:400,VPE:230,W:200,WPE:115,VM:393,PEM:226,vpe:'230 V',w:'unos 200 V'},
+         '690':{V:690,VPE:400,W:345,WPE:200,VM:682,PEM:394,vpe:'unos 400 V',w:'unos 345 V'}};
+var COMBO=[   // kW, red, conexión buena ('X' = no vale), corriente, -Q3, rango y ruleta de -F3
+ {kw:'1,5',red:'400',c:'Y',i:3.5,q3:'6 A',f3:'2,5-4 A'},
+ {kw:'1,5',red:'230',c:'D',i:6.0,q3:'10 A',f3:'4-6 A'},
+ {kw:'5,5',red:'690',c:'Y',i:6.4,q3:'10 A',f3:'6-9 A'},
+ {kw:'5,5',red:'400',c:'D',i:11.0,q3:'16 A',f3:'9-13 A'},
+ {kw:'5,5',red:'230',c:'X',vale:1},        // no vale: se cambia por el que sí vale para esa red
+ {kw:'1,5',red:'690',c:'X',vale:2}
+];
+var NOM={Y:'estrella',D:'triángulo'}, cb=COMBO[0], red='400';
+function A1(x){ return x.toFixed(1).replace('.',',').replace(',0','')+' A'; }
+function KK(){ var R=RED[red], i=cb.i||0; return {placa:A1(i),sob:A1(i*1.27),v:R.V+' V',w:R.w,vpe:R.vpe}; }
+function tk(s){ var k=KK(); return s.replace(/\{(\w+)\}/g,function(_,x){ return k[x]; }); }
 function txt(s){ return tk(s).replace(/-(Q|F|KM|M)(\d+)/g,'<b>-$1$2</b>'); }
 function rotulos(){
-  var R=RED[red]; for(var id in BASE){ $('dato-'+id).textContent=R.d[id]||BASE[id]; }
-  $('redv').textContent=R.v; $('rednota').innerHTML=txt(R.nota); $('subI').textContent=R.k.placa;
-  $('r400').classList.toggle('on',red==='400'); $('r230').classList.toggle('on',red==='230');
+  var R=RED[red], p=PL[cb.kw], ok=st&&st.con;
+  $('redv').textContent=R.V+' V';
+  $('dato-M3-0').textContent=cb.kw+' kW'+(ok?' · '+(cb.c==='D'?'Δ':'Y'):''); $('dato-M3-1').textContent=ok?A1(cb.i):'¿Y o Δ?';
+  $('dato-Q3-0').textContent=cb.q3?cb.q3+' · curva C':'¿?'; $('dato-F3-0').textContent=cb.f3||'¿?'; $('dato-F3-1').textContent=ok?'ruleta: '+A1(cb.i):'ruleta: ¿?';
+  $('rednota').innerHTML='<b>Motor -M3:</b> '+cb.kw+' kW · Δ '+p[1]+' · Y '+p[2]+'<br><b>Red:</b> '+R.V+' V entre fases<br>¿Cómo se conecta este motor a esta red?';
+  ['Y','D','X'].forEach(function(c){ var b=$('c'+c); b.disabled=!!ok; b.classList.toggle('on',!!ok&&cb.c===c); });
   $('marca').innerHTML=txt('<li>Entre <b>dos fases</b> distintas: {v}. Entre una fase y <b>PE</b>: {vpe}.</li>'+
     '<li>Entre dos puntos del <b>mismo hilo</b> (uno encima del otro): 0 V. Si hay varios voltios, <b>mal contacto</b>; si hay una tensión alta, entre los dos hay algo <b>abierto</b>.</li>'+
     '<li><b>20-30 V</b> en un cable sin tensión es una <b>tensión fantasma</b>: cuenta como 0 V.</li>'+
-    '<li>Pinza: las <b>tres fases iguales</b> y no más que la placa ({placa}).</li>');
-  document.querySelectorAll('#diag button').forEach(function(b){ var f=AV.filter(function(x){ return x.id===b.dataset.id; })[0]; b.innerHTML=txt(f.n); });
+    '<li>Pinza: las <b>tres fases iguales</b> y no más que la placa'+(ok?' ({placa})':'')+'.</li>');
+  document.querySelectorAll('#diag button').forEach(function(b){ var f=AV.filter(function(x){ return x.id===b.dataset.id; })[0]; b.innerHTML=txt(ok?f.n:f.n.replace(' de {placa}',' de la placa')); });
+}
+function conecta(c){
+  if(st.con) return; var R=RED[red], v=R.V+' V', m=$('conmsg');
+  if(cb.c==='X'){
+    if(c==='X'){ var n=COMBO[cb.vale]; tot2++; if(!st.fc) ok2++;
+      m.innerHTML='<span class="ok">✔ Eso es: no vale.</span> Los '+v+' de la red no están en la placa de ese motor ('+PL[cb.kw][0]+'). Se cambia por uno de <b>'+n.kw+' kW, de '+PL[n.kw][0]+'</b>. ¿Y este, cómo se conecta?';
+      cb=n; st.fc=0; st.cambiado=true; pinta(); return; }
+    st.fc++; m.innerHTML='<span class="bad">✘ No.</span> Busca en la placa los '+v+' de la red. ¿Están en alguna de las dos cajas?'; return; }
+  if(c===cb.c){ st.con=true; st.km=!!st.km0; tot2++; if(!st.fc) ok2++;
+    m.innerHTML='<span class="ok">✔ En '+NOM[c]+'.</span> Los '+v+' de la red están en la caja '+(c==='D'?'Δ':'Y')+' de la placa: el motor pide <b>'+A1(cb.i)+'</b> y a eso va la ruleta de -F3. Ahora, a por la avería.'.replace(/-F3/,'<b>-F3</b>');
+    $('now').innerHTML='<p>Motor conectado. Empieza por <b>mirar</b>: ¿hay alguna palanca bajada?, ¿ha saltado el térmico? Después, mide.</p>'; vigila(); pinta(); return; }
+  st.fc++;
+  if(c==='X') m.innerHTML='<span class="bad">✘ Sí vale.</span> Busca en la placa los '+v+' de la red: están en una de las dos cajas.';
+  else if(c==='D') m.innerHTML='<span class="bad">✘ No.</span> En la placa, los '+v+' están en la caja Y. En triángulo cada bobinado recibiría más tensión de la suya: se quemaría.';
+  else m.innerHTML='<span class="bad">✘ No.</span> En la placa, los '+v+' están en la caja Δ. En estrella cada bobinado recibiría menos tensión de la suya: no tendría fuerza.';
 }
 var AV=[
  {id:'sobre', n:'Sobrecarga: el motor pide más de {placa}', ini:{ft:true},
@@ -330,15 +358,18 @@ var AV=[
   como:'No salta nada. La pinza marca un poco menos en <b>L3</b>. Y entre '+B('F')+' y '+B('J')+', que son la entrada y la salida del mismo polo de -KM3, hay <b>8 V</b> en vez de 0 V: en ese polo la corriente pasa mal y se calienta.',
   arr:'Sin tensión: apretar el tornillo. Si el contacto o el cable están quemados, cambiar el contactor y cortar la punta dañada del cable.'}
 ];
-var st, T=[], ok=0, tot=0, modo='V', sel=[], fallos=0;
+var st, T=[], ok=0, tot=0, ok2=0, tot2=0, modo='V', sel=[], fallos=0;
 function later(ms,fn){ T.push(setTimeout(fn,ms)); }
 function clearT(){ T.forEach(clearTimeout); T=[]; }
-function nueva(f){
-  clearT(); st={f:f,q8:true,q3:true,ft:false,km:false,res:false,seq:0}; for(var k in f.ini) st[k]=f.ini[k];
+function nueva(f,c){
+  clearT(); cb=(typeof c==='number')?COMBO[c]:COMBO[Math.floor(Math.random()*COMBO.length)]; red=cb.red;
+  st={f:f,q8:true,q3:true,ft:false,km:false,res:false,seq:0,con:false,fc:0}; for(var k in f.ini) st[k]=f.ini[k];
+  st.km0=st.km; st.km=false;      // el motor no se pone en marcha hasta que está conectado
+  $('conmsg').innerHTML='';
   sel=[]; fallos=0; $('hist').innerHTML=''; $('dv').textContent='— — —'; $('dq').innerHTML='&nbsp;';
   $('sv1').textContent='Toca dos bolitas o un hilo'; $('sv2').textContent='— — —';
   $('oper').innerHTML='<p style="margin:0">'+f.oper+'</p>';
-  $('now').innerHTML='<p>Empieza por <b>mirar</b>: ¿hay alguna palanca bajada?, ¿ha saltado el térmico? Después, mide.</p>';
+  $('now').innerHTML='<p>Lo primero: <b>el motor y la red</b>. Mira la placa del motor y la tensión de la red y elige cómo se conecta. Después, a por la avería.</p>';
   document.querySelectorAll('#diag button').forEach(function(b){ b.className=''; b.disabled=false; });
   vigila(); pinta();
 }
@@ -385,9 +416,9 @@ function voltios(a,b){
 }
 function amperios(k){
   if(!st.km) return 0; var f=st.f.id, N=nodos();
-  var R=RED[red];
-  if(marcha()){ if(f==='sobre') return R.IS[k]; if(f==='contacto') return R.IC[k]; return R.I[k]; }
-  if(dos()) return (typeof N[3][k]==='number'&&N[3][k]===k)?R.I2:0;
+  var i=cb.i, d=[0,-0.1,0][k];
+  if(marcha()){ if(f==='sobre') return i*1.27+[0,0.1,0][k]; if(f==='contacto') return k===2?i*0.86:i+0.1; return i+d; }
+  if(dos()) return (typeof N[3][k]==='number'&&N[3][k]===k)?i*1.5:0;
   return 0;
 }
 function fmt(x,d){ return x.toFixed(d).replace('.',','); }
@@ -417,7 +448,7 @@ function pinta(){
   var sal=[]; if(!st.q8) sal.push('-Q8'); if(!st.q3) sal.push('-Q3'); if(st.ft) sal.push('-F3');
   $('verd').innerHTML=txt((sal.length?'Saltado: '+sal.join(' y ')+'. ':'No hay nada saltado. ')+'-KM3 '+(st.km?'está dentro.':'no está dentro.'));
   $('bQ8').disabled=st.q8; $('bQ3').disabled=st.q3; $('bF3').disabled=!st.ft;
-  $('marc').textContent=tot?('Averías encontradas: '+ok+' de '+tot):'';
+  $('marc').textContent=(tot2?'Conexiones a la primera: '+ok2+' de '+tot2+'. ':'')+(tot?'Averías encontradas: '+ok+' de '+tot+'.':'');
   rotulos();
   document.body.classList.toggle('pinza',modo==='A');
   $('tV').classList.toggle('on',modo==='V'); $('tA').classList.toggle('on',modo==='A');
@@ -448,7 +479,9 @@ document.querySelectorAll('#svg .pz').forEach(function(p){
 $('tV').onclick=function(){ modo='V'; sel=[]; pinta(); };
 $('tA').onclick=function(){ modo='A'; sel=[]; pinta(); };
 // ---------- mandos
+function falta(){ if(st.con) return false; di('Antes hay que <b>conectar el motor</b>: arriba, en «El motor y la red», elige estrella, triángulo o no vale.'); return true; }
 function darMarcha(){
+  if(falta()) return;
   if(st.km){ di('-KM3 ya está dentro.'); return; }
   if(st.f.id==='mando'){ di('Pulsas la marcha… y <b>-KM3 no entra</b>. No se oye nada.'); return; }
   if(st.ft){ di('Pulsas la marcha y -KM3 no entra: el térmico -F3 está saltado y su 95-96 corta el mando. Hay que pulsar <b>RESET</b>.'); return; }
@@ -470,19 +503,18 @@ $('bQ8').onclick=function(){ rearma('Q8'); }; $('bQ3').onclick=function(){ rearm
 document.querySelectorAll('#svg .hit').forEach(function(h){ h.addEventListener('click',function(){ rearma(h.dataset.dev); }); });
 // ---------- diagnóstico
 (function(){ var D=$('diag'); AV.forEach(function(f){ var b=document.createElement('button'); b.type='button'; b.dataset.id=f.id; b.innerHTML=txt(f.n);
-  b.onclick=function(){ if(st.res) return;
+  b.onclick=function(){ if(st.res||falta()) return;
     if(f.id===st.f.id){ st.res=true; tot++; if(fallos===0) ok++; b.className='bien';
       $('now').innerHTML='<p><span class="ok">✔ Eso es: '+txt(f.n.charAt(0).toLowerCase()+f.n.slice(1))+'.</span></p><p><b>Cómo se sabía.</b> '+txt(f.como)+'</p><p><b>Cómo se arregla.</b> '+txt(f.arr)+'</p>';
       $('now').scrollIntoView({behavior:'smooth',block:'nearest'}); pinta(); }
     else { fallos++; b.className='mal'; b.disabled=true; $('now').innerHTML='<p><span class="bad">✘ No es eso.</span> '+txt(st.f.pista)+'</p>'; } };
   D.appendChild(b); }); })();
-function ponRed(r){ if(r===red) return; red=r; try{ localStorage.setItem('red',r); }catch(e){} nueva(st.f); }
-$('r400').onclick=function(){ ponRed('400'); }; $('r230').onclick=function(){ ponRed('230'); };
+['Y','D','X'].forEach(function(c){ $('c'+c).onclick=function(){ conecta(c); }; });
 function otra(){ var c=AV.filter(function(f){ return !st||f.id!==st.f.id; }); nueva(c[Math.floor(Math.random()*c.length)]); }
 $('bOtra').onclick=function(){ if(st&&!st.res&&fallos>0){ tot++; } otra(); };
 var h=parseInt(location.hash.replace('#',''),10);
 if(h>=1&&h<=AV.length) nueva(AV[h-1]); else otra();
-window.__t7={AV:AV,nueva:nueva,voltios:voltios,amperios:amperios,st:function(){return st;},marcha:darMarcha,rearma:rearma,ponRed:ponRed,red:function(){return red;}};
+window.__t7={AV:AV,COMBO:COMBO,nueva:nueva,conecta:conecta,cb:function(){return cb;},voltios:voltios,amperios:amperios,st:function(){return st;},marcha:darMarcha,rearma:rearma,red:function(){return red;}};
 })();
 
 </script>
