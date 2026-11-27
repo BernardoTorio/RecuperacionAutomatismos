@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <script>(function(){try{var t=localStorage.getItem('tema');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>T7.11 ¿Qué protección salta?</title>
+<title>T8.11 ¿Qué protección salta?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
@@ -138,7 +138,7 @@ button:disabled{opacity:.45;cursor:default}
 .sim::after{content:"";display:block;clear:both}
 @media (max-width:620px){.simfig{float:none;width:100%;max-width:340px;margin:0 auto 10px}}
 
-/* ---- Tema 7 ---- */
+/* ---- Tema 8 ---- */
 .w.dead,.dot.dead{stroke:#A7AFB8}.dot.dead{fill:#A7AFB8}
 .fl{display:none;stroke:#FFE28A;stroke-width:1.5;stroke-linecap:round;stroke-dasharray:.5 15.5;fill:none;pointer-events:none}
 .fl.on{display:inline;animation:corre .9s linear infinite}
@@ -175,11 +175,11 @@ button:disabled{opacity:.45;cursor:default}
 </head>
 <body>
 <main>
-  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 7</a><span class="sep">›</span><b>T7.11 ¿Qué protección salta?</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
-  <nav class="t6nav" aria-label="Animaciones del Tema 7"><a class="arr off" href="#" aria-hidden="true" tabindex="-1">‹</a><span class="where">Tema 7 · 1 de 2</span><a class="arr" href="busca_averia.html" aria-label="Siguiente: T7.12 Busca la avería">T7.12 ›</a><div class="steps"><a href="averias_protecciones.html" class="cur" aria-current="page" title="¿Qué protección salta?">T7.11</a><a href="busca_averia.html" title="Busca la avería">T7.12</a></div></nav>
+  <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 8</a><span class="sep">›</span><b>T8.11 ¿Qué protección salta?</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
+  <nav class="t6nav" aria-label="Animaciones del Tema 8"><a class="arr off" href="#" aria-hidden="true" tabindex="-1">‹</a><span class="where">Tema 8 · 1 de 2</span><a class="arr" href="busca_averia.html" aria-label="Siguiente: T8.12 Busca la avería">T8.12 ›</a><div class="steps"><a href="averias_protecciones.html" class="cur" aria-current="page" title="¿Qué protección salta?">T8.11</a><a href="busca_averia.html" title="Busca la avería">T8.12</a></div></nav>
   <h1>¿Qué protección salta?</h1>
-  <p class="sub">El cuadro del Tema 7 con sus cuatro motores en marcha. <b>Elige una avería</b>, piensa qué protección va a actuar y <b>tócala en el esquema</b>. Después verás qué salta, qué motores se paran y cuáles siguen.</p>
-  <p class="serve">Te sirve para los <b>Ejercicios 2</b> (bloques B, C y D).</p>
+  <p class="sub">El cuadro del Tema 8 con sus cuatro motores en marcha. <b>Elige una avería</b>, piensa qué protección va a actuar y <b>tócala en el esquema</b>. Después verás qué salta, qué motores se paran y cuáles siguen.</p>
+  <p class="serve">Te sirve para los <b>Ejercicios 3</b> (bloques B, C y D).</p>
 
   <div class="layout">
     <div class="draw">
@@ -237,7 +237,7 @@ button:disabled{opacity:.45;cursor:default}
     </div>
   </div>
 
-  <a class="nextbig" href="busca_averia.html">Siguiente: T7.12 Busca la avería →</a>
+  <a class="nextbig" href="busca_averia.html">Siguiente: T8.12 Busca la avería →</a>
 </main>
 <script>
 
@@ -247,7 +247,7 @@ var ANC={"F0.1": [292.8, 40.8], "F0.2": [292.8, 62.4], "F0.3": [314.4, 40.8], "F
 var MOT={M1:'KM1',M2:'KM2',M3:'F3',M4:'F4'};      // tramo del que cuelga cada motor
 // ---- las dos redes: la fábrica (400 V, la del papel) y el taller (230 V sin neutro: los motores, en triángulo)
 var RED={
- '400':{v:'400 V',nota:'<b>Fábrica:</b> 400 V entre fases, con neutro. Es el cuadro de los apuntes y de los Ejercicios 2.',d:{},
+ '400':{v:'400 V',nota:'<b>Fábrica:</b> 400 V entre fases, con neutro. Es el cuadro de los apuntes y de los Ejercicios 3.',d:{},
    k:{m3i:'3,5 A',m3s:'4,5 A',q3:'6 A',m1i:'11 A',m1s:'13 A',m1mag:'182 A',m1pz:'16 A · 0 A · 16 A',q7:'16 A',q4:'10 A',q0:'40 A',vpe:'230 V'}},
  '230':{v:'230 V',nota:'<b>Taller:</b> 230 V entre fases, sin neutro. Los motores van en <b>triángulo</b> y son de menos potencia, pero piden <b>la misma corriente</b> que los de la fábrica: no cambia ninguna protección ni ningún cable.',
    d:{'M1-0':'Δ · 230 V','M2-0':'Δ · 230 V','M3-0':'Δ · 230 V','M4-0':'Δ · 230 V'},

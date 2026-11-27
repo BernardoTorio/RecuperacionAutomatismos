@@ -8,19 +8,33 @@ Todas las reglas de la web de Automatismos valen aquí (su `CLAUDE.md` manda): n
 
 ## Qué hay
 ```
-index.html                  portada (la de Automatismos, solo con los Temas 6 y 7): var HOY = 7;
-temas/                      T6_Dimensionamiento_protecciones.pdf · T7_Resolucion_averias_Automatismos.pdf
+index.html                  portada (la de Automatismos, solo con los Temas 6, 7 y 8): var HOY = 7;
+temas/                      T6_Dimensionamiento_protecciones.pdf
+                            T7_Conexionado_motores_trifasicos_Automatismos.pdf   (Tema 7)
+                            T7_Resolucion_averias_Automatismos.pdf               (Tema 8: el archivo conserva su nombre)
 ejercicios/                 T6_Ejercicios_Dimensionamiento_protecciones.pdf (Ejercicios 1)
-                            T7_Ejercicios_Resolucion_averias_Automatismos.pdf (Ejercicios 2: 60 preguntas tipo test)
+                            T7_Ejercicios_Conexionado_motores_trifasicos_Automatismos.pdf (Ejercicios 2: 40 preguntas tipo test)
+                            T7_Ejercicios_Resolucion_averias_Automatismos.pdf (Ejercicios 3: 60 preguntas; conserva su nombre)
+practicas/                  P6_Automatismos.pdf (Práctica 6 · Arranque estrella-triángulo; sale como «chip» del Tema 7 y en #ejercicios)
 intensidad_calor.html … cuadro_motores.html    las seis animaciones del Tema 6, copiadas tal cual de Automatismos (vuelven a #ejercicios)
-averias_protecciones.html   T7.11 ¿Qué protección salta?  (vuelve a #animaciones)
-busca_averia.html           T7.12 Busca la avería          (vuelve a #animaciones)
+motor_red.html              T7.7  Estrella o triángulo: el motor y la red  (vuelve a #animaciones)
+estrella_triangulo.html     T7.12 Arranque estrella-triángulo              (vuelve a #animaciones)
+averias_protecciones.html   T8.11 ¿Qué protección salta?  (vuelve a #animaciones)
+busca_averia.html           T8.12 Busca la avería          (vuelve a #animaciones)
 ```
+- **Renumeración del 27/11/2026** (lo decidió el profesor): el Tema 7 es ahora **Conexionado de motores trifásicos** y **Resolución de averías pasa a ser el Tema 8** (sus ejercicios, Ejercicios 3; sus animaciones, T8.11 y T8.12). Los **nombres de archivo no cambian** (`T7_Resolucion_averias…`, `averias_protecciones.html`, `busca_averia.html`). Hecho: la portada y los rótulos de las dos animaciones. **Pendiente:** los dos PDF de averías siguen diciendo por dentro «Tema 7» y «Ejercicios 2» (hay que regenerarlos desde su Word de `C:\dev\originales`), y los guiones `claude/automatismos/T7/gen_anim.py` y `gen_index.py` del proyecto siguen con la numeración vieja: antes de regenerar con ellos, cambiar T7.11 → T8.11, T7.12 → T8.12, «Tema 7» → «Tema 8», «Ejercicios 2» → «Ejercicios 3» y los puntos 7.12 y 7.13 → 8.12 y 8.13.
 - Lo del Tema 6 es **copia** de la web de Automatismos: si allí cambia algo, se copia aquí otra vez (no se edita aquí por separado).
-- Las soluciones de los Ejercicios 2 **no se publican**: están en `C:\dev\originales\automatismos\ejercicios\T7_Soluciones_Resolucion_averias_Automatismos.docx`.
+- Las soluciones de los ejercicios **no se publican aquí**: las de averías están en `C:\dev\originales\automatismos\ejercicios\T7_Soluciones_Resolucion_averias_Automatismos.docx`; las del Tema 7 y las de la Práctica 6, en la web provisional (`BernardoTorio/provisional`, sección `#t7`).
 - `bernardotorio.github.io` es el mismo sitio para todas las webs: la marca «✓ vista» de las animaciones del Tema 6 se comparte con la web de Automatismos (misma clave `visto:<archivo>`).
 
-## Tema 7 · Resolución de averías
+## Tema 7 · Conexionado de motores trifásicos
+- Apuntes (11 páginas): bobinados y caja de bornes (U1 V1 W1 arriba, W2 U2 V2 abajo), estrella (pletinas tumbadas) y triángulo (pletinas de pie), las dos tensiones de una red (la de red, entre fases, y la de fase y neutro: escalera 130 · 230 · 400 · 690), las dos tensiones de la placa, cómo se elige la conexión, qué pasa si te equivocas y el arranque estrella-triángulo.
+- Motores del tema (los del punto 6.2): **Motor A** 3 kW, Δ 230 V 11,0 A · Y 400 V 6,4 A; **Motor B** 11 kW, Δ 400 V 21,5 A · Y 690 V 12,4 A. En los ejercicios, además, Motor C (1,5 kW, 230/400 V, 6,1/3,5 A) y Motor D (7,5 kW, 400/690 V, 14,8/8,5 A).
+- Arranque estrella-triángulo: **-KM1** línea, **-KM2** estrella (con el puente arriba, en sus tornillos 1-3-5) y **-KM3** triángulo (L1 a W2, L2 a U2, L3 a V2). El tiempo lo cuenta **-KT1**, un contactor aparte con el bloque temporizado a la conexión (55-56 y 67-68), como en la Práctica 5. Enclavamiento con los 61-62. El bornero -X1 tiene seis tornillos (1-2-3 a U1 V1 W1; 4-5-6 a W2 U2 V2). **-F1 va debajo de -KM1**: por él solo pasa la corriente de un bobinado y su ruleta se pone en la corriente pequeña de la placa (caja Y).
+- `motor_red.html` (T7.7): red de 230, 400 o 690 V, motor A o B y pletinas; dice qué recibe cada bobinado. Guarda la red en `localStorage` (clave `red`, la misma de las animaciones de averías). `estrella_triangulo.html` (T7.12): fuerza y mando con el motor de cálculo de las animaciones de las prácticas, ruleta de -KT1 de 1 a 5 s, gráfica de la corriente y selector 230 V taller / 400 V fábrica.
+- Todo sale de guiones guardados en el proyecto «Materiales para instituto» (`claude/automatismos/T7_conexionado/` y `claude/automatismos/T7_conexionado_estado.md`): **no se editan a mano los HTML**.
+
+## Tema 8 · Resolución de averías (antes, Tema 7)
 - Todo el tema, los Ejercicios 2 y las dos animaciones usan **el mismo cuadro**: un esquema de fuerza de fábrica (red de 400 V) con cuatro motores. Es la antigua Práctica 10, redibujada con los criterios actuales y con valores que cumplen el Tema 6:
   - `-F0` fusibles generales 3 × 63 A gG (cable de 16 mm²) → `-Q0` magnetotérmico general 40 A curva C (cable de 6 mm²).
   - Línea de `-M1` (5,5 kW Δ, 11 A): diferencial `-Q5` 40 A 30 mA → guardamotor `-Q1` 10-14 A, ruleta 11 A → `-KM1`.
