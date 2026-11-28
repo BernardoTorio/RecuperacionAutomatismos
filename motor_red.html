@@ -96,7 +96,7 @@ button.latched{box-shadow:0 0 0 4px #F2B400}
 /* ---- barra superior: volver, dónde estás, tema ---- */
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 14px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
 .tb-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
-.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:36px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1.25rem;font-weight:700;background:transparent}
+.tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;height:36px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;white-space:nowrap;font-weight:700;background:transparent}
 .tbback:hover,.themebtn:hover{border-color:#1F4E79}
 .crumbs{min-width:0;flex:1;overflow:hidden;white-space:nowrap;direction:rtl;text-align:left;font-size:.92rem;color:var(--muted)}
 .crumbs span.in{direction:ltr;unicode-bidi:bidi-override}
@@ -117,7 +117,6 @@ svg line.w.wf{opacity:1;stroke:#FF1F1F;stroke-width:6;filter:drop-shadow(0 0 2px
 .howto li{margin:3px 0}
 .lv{display:inline-block;width:26px;height:6px;border-radius:3px;background:#FF1F1F;vertical-align:middle;box-shadow:0 0 3px rgba(255,40,40,.6)}
 .lvoff{display:inline-block;width:26px;height:3px;border-radius:2px;background:#D0191C;opacity:.42;vertical-align:middle}
-.lvflow{display:inline-block;width:26px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,#F5B400 0 7px,transparent 7px 12px);vertical-align:middle}
 
 .cdt{font-weight:700;font-size:16px;fill:#9a6a00}
 .fcbody{fill:#dfe4ea;stroke:#333;stroke-width:3;transition:fill .15s}
@@ -147,8 +146,8 @@ button:disabled{opacity:.45;cursor:default}
 @media (max-width:820px){ .grid.wide .side{grid-template-columns:1fr} }
 
 .tbback{flex:none;display:inline-flex;align-items:center;justify-content:center;width:auto;height:44px;padding:0 12px;border-radius:10px;border:2px solid var(--line);color:var(--ink);text-decoration:none;font-size:1rem;font-weight:700;background:transparent;white-space:nowrap}
-.themebtn{height:44px}
-.crumbs{display:none}
+.themebtn{height:44px;width:44px}
+@media (max-width:620px){.crumbs{display:none}}
 .t6nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
 .t6nav a{text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:10px;font-weight:700;background:var(--btn);min-height:44px;display:flex;align-items:center;justify-content:center;padding:0 12px}
 .t6nav a:hover{border-color:#1F4E79}
@@ -186,7 +185,7 @@ button:disabled{opacity:.45;cursor:default}
 <body>
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 7</a><span class="sep">›</span><b>T7.7 Estrella o triángulo: el motor y la red</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
-  <nav class="t6nav" aria-label="Animaciones del Tema 7"><a class="arr off" href="#" aria-hidden="true" tabindex="-1">‹</a><span class="where">Tema 7 · 1 de 2</span><a class="arr" href="estrella_triangulo.html" aria-label="Siguiente: T7.12 Arranque estrella-triángulo">T7.12 ›</a><div class="steps"><a href="motor_red.html" class="cur" aria-current="page" title="Estrella o triángulo: el motor y la red">T7.7</a><a href="estrella_triangulo.html" title="Arranque estrella-triángulo">T7.12</a></div></nav>
+  <nav class="t6nav" aria-label="Animaciones del Tema 7"><a class="arr off" aria-hidden="true" tabindex="-1">‹ T7.7</a><span class="where">Tema 7 · 1 de 2</span><a class="arr" href="estrella_triangulo.html" aria-label="Siguiente: T7.12 Arranque estrella-triángulo">T7.12 ›</a><div class="steps"><a href="motor_red.html" class="cur" aria-current="page" title="Estrella o triángulo: el motor y la red">T7.7</a><a href="estrella_triangulo.html" title="Arranque estrella-triángulo">T7.12</a></div></nav>
   <h1>Estrella o triángulo: el motor y la red</h1>
   <p class="sub">El mismo motor no se conecta igual en todas partes. Elige la <b>red</b> y el <b>motor</b>, pon las <b>pletinas</b> en estrella o en triángulo y mira cuántos voltios recibe cada bobinado.</p>
   <p class="serve">Te sirve para los puntos <b>7.2</b> a <b>7.8</b> de los apuntes y para los bloques B y C de los <b>Ejercicios 2</b>.</p>
@@ -200,8 +199,8 @@ button:disabled{opacity:.45;cursor:default}
     <div class="card explain"><h2>Qué está pasando</h2><div id="explain" aria-live="polite"></div></div>
     <div class="card idea"><h2>Para qué sirve</h2><p>Antes de dar tensión a un motor hay que mirar <b>tres cosas</b>: la red, la placa y las pletinas.</p><p>El mismo motor de 230/400 V va en <b>triángulo</b> en nuestro taller (230 V) y en <b>estrella</b> en una fábrica (400 V). Si se monta tal cual de un sitio en el otro, o se quema o no tiene fuerza.</p></div>
   </div>
-  <div class="card howto" style="margin-top:16px"><h2>Cómo funciona esta animación</h2><ul><li><b>Toca la caja de bornes</b> para cambiar las pletinas: tumbadas (estrella) o de pie (triángulo).</li><li><b>Toca la red</b> (L1, L2, L3) para cambiar de red y <b>toca la placa</b> para cambiar de motor. También puedes usar los botones 1, 2 y 3.</li><li>A la derecha ves cómo quedan los <b>tres bobinados</b> y cuántos voltios recibe cada uno. <span class="cb ok"></span> bien · <span class="cb poco"></span> le falta tensión · <span class="cb mucho"></span> le sobra: se quema.</li><li>Los cables rojos gruesos <span class="lv"></span> tienen tensión; los puntitos claros que se mueven son la corriente.</li></ul></div>
-  <p class="foot">Toca en el dibujo la <b>red</b>, la <b>caja de bornes</b> y la <b>placa</b>, o usa los botones. Los puntitos claros que se mueven son la <b>corriente</b>. Teclado: <kbd>Esc</kbd> volver.</p>
+  <div class="card howto" style="margin-top:16px"><h2>Cómo funciona esta animación</h2><ul><li><b>Toca la caja de bornes</b> para cambiar las pletinas: tumbadas (estrella) o de pie (triángulo).</li><li><b>Toca la red</b> (L1, L2, L3) para cambiar de red y <b>toca la placa</b> para cambiar de motor. También puedes usar los botones 1, 2 y 3.</li><li>A la derecha ves cómo quedan los <b>tres bobinados</b> y cuántos voltios recibe cada uno. <span class="cb ok"></span> bien · <span class="cb poco"></span> le falta tensión · <span class="cb mucho"></span> le sobra: se quema.</li><li>Los cables rojos gruesos <span class="lv"></span> tienen tensión; los puntos amarillos que se mueven por los cables son la corriente.</li></ul></div>
+  <p class="foot">Toca en el dibujo la <b>red</b>, la <b>caja de bornes</b> y la <b>placa</b>, o usa los botones. Los puntos amarillos que se mueven por los cables son la <b>corriente</b>. Teclado: <kbd>Esc</kbd> volver.</p>
   <a class="nextbig" href="estrella_triangulo.html">Siguiente: T7.12 Arranque estrella-triángulo →</a>
 </main>
 <script>
@@ -254,7 +253,7 @@ clic('cD', function(){ st.con = 'D'; pinta(); }); clic('cY', function(){ st.con 
 clic('gCaja', function(){ st.con = st.con === 'Y' ? 'D' : 'Y'; pinta(); });
 clic('gPlaca', function(){ st.mot = st.mot === 'A' ? 'B' : 'A'; pinta(); });
 clic('gRed', function(){ red(st.red === 230 ? 400 : st.red === 400 ? 690 : 230); });
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT'){ e.preventDefault(); location.href = 'index.html#animaciones'; } } });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape' || e.key === 'Backspace'){ var tg = e.target.tagName; if (tg !== 'INPUT' && tg !== 'TEXTAREA' && tg !== 'SELECT'){ e.preventDefault(); location.href = 'index.html#animaciones'; } } });
 pinta();
 })();
 </script>
@@ -270,7 +269,7 @@ pinta();
 })();</script>
 <script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
   try {
-    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    var me = location.pathname.split('/').pop(); if (me && !/\.html$/.test(me)) me += '.html'; if (me) localStorage.setItem('visto:' + me, '1');
     document.querySelectorAll('.t6nav .steps a').forEach(function(a){
       if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
     });

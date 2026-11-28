@@ -52,3 +52,13 @@ busca_averia.html           T8.13 Busca la avería          (vuelve a #animacion
 - Los ocho tipos de avería: sobrecarga, cortocircuito, derivación a tierra, falta de fase, mal contacto, cable dañado, fases cambiadas y protección mal elegida o mal ajustada (aquí entra también el motor en la conexión equivocada).
 - Modelo de clase (no «corregirlo»): salta la protección **más cercana aguas arriba**; el relé térmico no corta la fuerza (abre su 95-96 y cae el contactor); en la falta de fase la pinza marca 0 A en una fase y una vez y media en las otras, y la fase que falta marca la mitad de la red por los bobinados; tensión fantasma 20-30 V = 0 V; el diferencial de 30 mA salta entre 15 y 30 mA.
 - Las dos animaciones, las figuras y los Word salen de guiones guardados en el proyecto «Materiales para instituto» (`claude/automatismos/T8/` y `claude/automatismos/T8_averias_estado.md`): **no se editan a mano los HTML**; se cambia el guion y se regeneran. La portada es la que dejó la sesión del Tema 7; `gen_index8.py` solo pone al día en ella lo del Tema 8.
+
+## Pendiente en los guiones (28/11/2026)
+El 28/11 se arreglaron **a mano** `motor_red.html`, `estrella_triangulo.html`, `averias_protecciones.html` y `busca_averia.html` para igualarlos con Automatismos (los guiones no estaban en el PC). **Antes de regenerar**, hay que llevar estos cambios a los guiones de `claude/automatismos/T7_conexionado/` y de `claude/automatismos/T8/`, o se pierden:
+- **Miga** (T7.7 y T7.12): `.crumbs{display:none}` pasa a `@media (max-width:620px){.crumbs{display:none}}` (antes no se veía ni en el ordenador).
+- **Esc y Retroceso** (T7.7 y T7.12): no actúan con el foco en `INPUT`, `TEXTAREA` ni `SELECT` (antes, solo `INPUT`).
+- **Marca «✓ vista»** (las cuatro): si la dirección llega sin `.html`, se le añade: `if (me && !/\.html$/.test(me)) me += '.html';`.
+- **Tira**: en la primera del tema, la flecha apagada va sin `href` y con su etiqueta (`<a class="arr off" aria-hidden="true" tabindex="-1">‹ T7.7</a>`, `‹ T8.12`); en la última, la flecha de la derecha también va apagada (`T7.12 ›`, `T8.13 ›`), no «Fin ›» con enlace.
+- **Botón final de T7.12**: «Has llegado al final del Tema 7 · Volver a las animaciones →» (como el de T8.13).
+- **CSS** (T7.7 y T7.12): `.tbback` sin ancho fijo de 40 px, `.themebtn{height:44px;width:44px}` y fuera el `.lvflow` que no se usaba.
+- **Texto de la corriente** (T7.7, T7.12 y T8.12): «Los puntos amarillos que se mueven por los cables son la corriente» (antes, «Los puntitos claros…»).

@@ -181,7 +181,7 @@ button:disabled{opacity:.45;cursor:default}
 <body>
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 8</a><span class="sep">›</span><b>T8.12 ¿Qué protección salta?</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
-  <nav class="t6nav" aria-label="Animaciones del Tema 8"><a class="arr off" href="#" aria-hidden="true" tabindex="-1">‹</a><span class="where">Tema 8 · 1 de 2</span><a class="arr" href="busca_averia.html" aria-label="Siguiente: T8.13 Busca la avería">T8.13 ›</a><div class="steps"><a href="averias_protecciones.html" class="cur" aria-current="page" title="¿Qué protección salta?">T8.12</a><a href="busca_averia.html" title="Busca la avería">T8.13</a></div></nav>
+  <nav class="t6nav" aria-label="Animaciones del Tema 8"><a class="arr off" aria-hidden="true" tabindex="-1">‹ T8.12</a><span class="where">Tema 8 · 1 de 2</span><a class="arr" href="busca_averia.html" aria-label="Siguiente: T8.13 Busca la avería">T8.13 ›</a><div class="steps"><a href="averias_protecciones.html" class="cur" aria-current="page" title="¿Qué protección salta?">T8.12</a><a href="busca_averia.html" title="Busca la avería">T8.13</a></div></nav>
   <h1>¿Qué protección salta?</h1>
   <p class="sub">El cuadro del Tema 8. Primero <b>elige la red y conecta cada motor</b> según su placa. Después <b>elige una avería</b>, piensa qué protección va a actuar y <b>tócala en el esquema</b>. Después verás qué salta, qué motores se paran y cuáles siguen.</p>
   <p class="serve">Te sirve para los puntos <b>8.2</b> y <b>8.12</b> de los apuntes y para los <b>Ejercicios 3</b>.</p>
@@ -236,7 +236,7 @@ button:disabled{opacity:.45;cursor:default}
       <h2>Cómo funciona esta animación</h2>
       <ul style="margin-top:0">
         <li>Primero eliges <b>la red</b> (230, 400 o 690 V) y <b>conectas cada motor</b>: busca en su placa la tensión de la red y pulsa <b>Y</b>, <b>Δ</b> o <b>No</b>. Con otra red, los motores son otros.</li>
-        <li>Los cables <b>rojos</b> tienen tensión; los <b>grises</b>, no. Los puntitos claros son la corriente.</li>
+        <li>Los cables <b>rojos</b> tienen tensión; los <b>grises</b>, no. Los puntos amarillos que se mueven por los cables son la corriente.</li>
         <li>Elige una avería de la lista: aparece marcada con un <b>rayo</b> en el esquema.</li>
         <li><b>Toca la protección</b> que crees que salta. Si crees que no salta ninguna, pulsa «No salta nada».</li>
         <li>Sin avería elegida puedes <b>tocar cualquier aparato</b> para abrirlo o cerrarlo y ver qué se queda sin tensión aguas abajo.</li>
@@ -502,7 +502,7 @@ window.__t7={S:S,elegir:elegir,resolver:resolver,st:function(){return st;},estad
 })();</script>
 <script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
   try {
-    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    var me = location.pathname.split('/').pop(); if (me && !/\.html$/.test(me)) me += '.html'; if (me) localStorage.setItem('visto:' + me, '1');
     document.querySelectorAll('.t6nav .steps a').forEach(function(a){
       if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
     });

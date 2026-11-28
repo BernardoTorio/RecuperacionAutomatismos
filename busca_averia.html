@@ -193,7 +193,7 @@ body.pinza .pz .aro{opacity:.35}body.pinza .pz.on .aro{opacity:1}
 <body>
 <main>
   <header class="topbar"><div class="tb-left"><a class="tbback" href="index.html#animaciones" title="Volver al índice (tecla Esc)">← Volver al índice</a><nav class="crumbs" aria-label="Dónde estás"><span class="in"><a href="index.html">Automatismos</a><span class="sep">›</span><a href="index.html#animaciones">Animaciones</a><span class="sep">›</span><a href="index.html#animaciones">Tema 8</a><span class="sep">›</span><b>T8.13 Busca la avería</b></span></nav></div><button id="themeBtn" class="themebtn" type="button" aria-label="Cambiar modo claro u oscuro">🌙</button></header>
-  <nav class="t6nav" aria-label="Animaciones del Tema 8"><a class="arr" href="averias_protecciones.html" aria-label="Anterior: T8.12 ¿Qué protección salta?">‹ T8.12</a><span class="where">Tema 8 · 2 de 2</span><a class="arr" href="index.html#animaciones" aria-label="Volver a las animaciones">Fin ›</a><div class="steps"><a href="averias_protecciones.html" title="¿Qué protección salta?">T8.12</a><a href="busca_averia.html" class="cur" aria-current="page" title="Busca la avería">T8.13</a></div></nav>
+  <nav class="t6nav" aria-label="Animaciones del Tema 8"><a class="arr" href="averias_protecciones.html" aria-label="Anterior: T8.12 ¿Qué protección salta?">‹ T8.12</a><span class="where">Tema 8 · 2 de 2</span><a class="arr off" aria-hidden="true" tabindex="-1">T8.13 ›</a><div class="steps"><a href="averias_protecciones.html" title="¿Qué protección salta?">T8.12</a><a href="busca_averia.html" class="cur" aria-current="page" title="Busca la avería">T8.13</a></div></nav>
   <h1>Busca la avería</h1>
   <p class="sub">Cada vez te toca <b>un motor y una red</b>. Primero <b>elige la conexión</b> del motor. Después, la línea tiene una <b>avería escondida</b>: lee lo que cuenta el operario, mira qué ha saltado, <b>mide</b> con el polímetro y con la pinza… y di qué avería es.</p>
   <p class="serve">Te sirve para los <b>Ejercicios 3</b> y para los puntos <b>8.2</b>, <b>8.13</b> y <b>8.14</b> de los apuntes.</p>
@@ -531,7 +531,7 @@ window.__t7={AV:AV,COMBO:COMBO,nueva:nueva,conecta:conecta,cb:function(){return 
 })();</script>
 <script>(function(){ // marca «vista»: esta animación y, en la tira del tema, las que ya se han abierto
   try {
-    var me = location.pathname.split('/').pop(); if (me) localStorage.setItem('visto:' + me, '1');
+    var me = location.pathname.split('/').pop(); if (me && !/\.html$/.test(me)) me += '.html'; if (me) localStorage.setItem('visto:' + me, '1');
     document.querySelectorAll('.t6nav .steps a').forEach(function(a){
       if (localStorage.getItem('visto:' + a.getAttribute('href'))) { a.classList.add('seen'); a.title = (a.title ? a.title + ' · ' : '') + 'ya la has visto'; }
     });
